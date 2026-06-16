@@ -1,0 +1,22 @@
+{
+  "short_name": "QuickSend",
+  "name": "QuickSend — Global USDT Remittance",
+  "description": "Send money globally with USDT. Fast, secure, and affordable cross-border transfers.",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#4f46e5",
+  "background_color": "#f8fafc",
+  "orientation": "portrait"
+}
