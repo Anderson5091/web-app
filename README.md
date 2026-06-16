@@ -1,73 +1,119 @@
-# React + TypeScript + Vite
+# QuickSend Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern fintech web application for managing multi-currency crypto wallets, transfers, and compliance.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+QuickSend Web is a React-based single-page application that provides a complete digital wallet experience. Users can deposit and withdraw USDT across multiple networks (TRC-20, ERC-20, SOL, MATIC), send money to beneficiaries, track payouts in real time, and manage KYC/compliance requirements.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript)](https://www.typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite)](https://vite.dev)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?logo=tailwindcss)](https://tailwindcss.com)
+[![React Router](https://img.shields.io/badge/React_Router-7-CA4245?logo=reactrouter)](https://reactrouter.com)
+[![TanStack Query](https://img.shields.io/badge/TanStack_Query-5-FF4154?logo=reactquery)](https://tanstack.com/query)
+[![Zustand](https://img.shields.io/badge/Zustand-5-000000)](https://github.com/pmndrs/zustand)
+[![Axios](https://img.shields.io/badge/Axios-1-5A29E4?logo=axios)](https://axios-http.com)
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+| Feature | Description |
+|---|---|
+| **Authentication** | Login, registration, phone verification, MFA (SMS/authenticator) |
+| **Wallet** | Multi-network wallet with deposit (QR code), withdraw, and transaction history |
+| **Transfers** | Send money to beneficiaries with live exchange rate quotes |
+| **Beneficiaries** | Save and manage frequently used recipients |
+| **Payout Tracking** | Real-time status monitoring for outgoing payments |
+| **Compliance & KYC** | Tier-based identity verification and document upload |
+| **Notifications** | In-app notification center for alerts and updates |
+| **Profile** | Onboarding flow with personal details setup |
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Prerequisites
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js >= 20
+- npm or pnpm
+
+### Installation
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Environment Variables
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Create a `.env` file in the project root:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```env
+VITE_API_URL=https://your-api-url.com/api/v1
 ```
+
+### Development
+
+```bash
+npm run dev
+```
+
+Opens at `http://localhost:5173`.
+
+### Build
+
+```bash
+npm run build
+```
+
+Output is written to the `dist/` directory.
+
+### Preview Production Build
+
+```bash
+npm run preview
+```
+
+### Lint
+
+```bash
+npm run lint
+```
+
+## Project Structure
+
+```
+src/
+├── api/              # Axios client & interceptors
+├── assets/           # Static assets (images, icons)
+├── components/       # Reusable UI components
+│   ├── feature/      # Feature-specific components
+│   ├── guards/       # Route guards (ProtectedRoute, PublicRoute)
+│   ├── layout/       # App shell layouts
+│   ├── notifications/# Notification UI
+│   └── ui/           # Primitive components (Button, Input, Card, etc.)
+├── config/           # App configuration & env vars
+├── features/         # Domain modules
+│   ├── auth/         # Auth store, API, types
+│   ├── wallet/       # Wallet store, service, API, types
+│   ├── transfers/    # Transfer & quote API, store, types
+│   ├── beneficiaries/# Beneficiary API, store, types
+│   ├── payout/       # Payout API, store, types
+│   ├── compliance/   # Compliance API, store, types
+│   └── notifications/# Notification API, store, types
+├── hooks/            # Shared React hooks
+├── pages/            # Route-level components
+├── routes/           # Route definitions (public + protected)
+├── services/         # Shared services
+├── store/            # Global stores
+├── styles/           # Additional style files
+├── types/            # Shared TypeScript types
+└── utils/            # Utility functions
+```
+
+## Deployment
+
+The app is built as a static SPA and can be served behind any web server. An `nginx.conf` is included for Nginx deployments — it ensures all routes fall back to `index.html` for client-side routing.
+
+## License
+
+MIT
