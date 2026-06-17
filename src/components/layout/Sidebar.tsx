@@ -62,16 +62,14 @@ export default function Sidebar() {
     <aside className="hidden md:flex flex-col w-64 bg-card border-r border-border h-screen shrink-0">
       {/* Logo + Notifications */}
       <div className="flex items-center gap-3 px-6 py-5 border-b border-border">
-        <div className="w-9 h-9 rounded-lg bg-gradient-to-r from-[#00D6A3] to-[#0084FF] flex items-center justify-center text-white font-extrabold text-lg shadow-lg shadow-[#00D6A3]/20">
-          QS
+        <div className="w-9 h-9 rounded-md bg-gradient-to-r from-[#00D6A3] to-[#0084FF] flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-[#00D6A3]/20 shrink-0">
+          Q
         </div>
-        <div className="flex-1 min-w-0">
-          <span className="font-extrabold text-text-primary tracking-tight text-lg leading-none block">QuickSend</span>
-          <span className="text-text-subtle text-[10px] font-medium">Secure transfers</span>
-        </div>
+        <span className="font-extrabold text-text-primary tracking-tight text-lg">QuickSend</span>
         <Link
           to="/notifications"
-          className="relative flex items-center text-text-secondary hover:text-primary transition-colors p-1.5"
+          className="ml-auto relative flex items-center text-text-secondary hover:text-primary transition-colors py-1.5 pl-1.5"
+          style={{ paddingRight: "3px" }}
         >
           <Bell size={18} />
           {unreadCount > 0 && (

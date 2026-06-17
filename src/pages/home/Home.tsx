@@ -1,18 +1,21 @@
 import { useAuthStore } from "../../features/auth/auth.store";
 import { useWalletStore } from "../../features/wallet/wallet.store";
+import { useNotificationStore } from "../../features/notifications/notification.store";
 import { useNavigate } from "react-router-dom";
-import { Send, ArrowDownLeft, ArrowUpRight, History, Verified, ArrowRight } from "lucide-react";
+import { Send, ArrowDownLeft, ArrowUpRight, History, Verified, ArrowRight, Bell } from "lucide-react";
 import { useEffect } from "react";
 
 export default function Home() {
   const user = useAuthStore((state) => state.user);
   const { wallet, transactions, fetchWallet, fetchTransactions } = useWalletStore();
+  const { unreadCount, fetchUnreadCount } = useNotificationStore();
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchWallet();
     fetchTransactions();
-  }, [fetchWallet, fetchTransactions]);
+    fetchUnreadCount();
+  }, [fetchWallet, fetchTransactions, fetchUnreadCount]);
 
   const recent = transactions.slice(0, 3);
   const firstName = user?.name?.split(" ")[0] || "User";
@@ -28,14 +31,27 @@ export default function Home() {
     <div className="min-h-screen bg-app-bg">
       <div className="max-w-4xl mx-auto p-4">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-11 h-11 rounded-full bg-primary-dim border border-primary-border flex items-center justify-center shrink-0">
-            <span className="text-primary text-lg font-bold">{firstName[0]}</span>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <div className="w-11 h-11 rounded-full bg-primary-dim border border-primary-border flex items-center justify-center shrink-0">
+              <span className="text-primary text-lg font-bold">{firstName[0]}</span>
+            </div>
+            <div>
+              <p className="text-text-secondary text-sm">Good morning,</p>
+              <h1 className="text-text-primary text-2xl font-bold">{firstName} 👋</h1>
+            </div>
           </div>
-          <div>
-            <p className="text-text-secondary text-sm">Good morning,</p>
-            <h1 className="text-text-primary text-2xl font-bold">{firstName} 👋</h1>
-          </div>
+          <button
+            onClick={() => navigate("/notifications")}
+            className="md:hidden relative w-11 h-11 rounded-full bg-card border border-border flex items-center justify-center shrink-0 hover:border-primary/30 transition-colors"
+          >
+            <Bell size={20} className="text-text-secondary" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-danger text-white text-[10px] font-bold flex items-center justify-center">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </button>
         </div>
 
         {/* Balance Card */}
