@@ -35,7 +35,7 @@ export default function Register() {
     setApiError(null);
     try {
       const res = await AuthService.register({ email: email.trim().toLowerCase(), phone: phone.trim(), fullName: name.trim(), password });
-      navigate(`/verify-phone?userId=${res.userId}&email=${encodeURIComponent(res.email || "")}&phone=${encodeURIComponent(res.phone || "")}`);
+      navigate(`/verify-phone?token=${encodeURIComponent(res.token)}&phone=${encodeURIComponent(res.phone || "")}`);
     } catch (err: any) {
       const message = err?.response?.data?.error || err?.response?.data?.message || err?.message || "Registration failed";
       setApiError(message);
@@ -55,7 +55,7 @@ export default function Register() {
           <span className="text-3xl">🎁</span>
           <div>
             <p className="text-primary text-base font-semibold">Welcome Bonus: 2 USDT</p>
-            <p className="text-text-secondary text-xs mt-0.5">Automatically credited on registration</p>
+            <p className="text-text-secondary text-xs mt-0.5">Credited after phone verification</p>
           </div>
         </div>
 

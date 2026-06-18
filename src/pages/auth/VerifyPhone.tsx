@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { authApi } from "../../api/auth.api";
+import { useAuthStore } from "../../features/auth/auth.store";
 import GradientButton from "../../components/ui/GradientButton";
 
 export default function VerifyPhone() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const userId = searchParams.get("userId");
-  const email = searchParams.get("email");
+  const setAuth = useAuthStore((state) => state.setAuth);
+  const token = searchParams.get("token") || "";
   const phone = searchParams.get("phone");
 
   const [digits, setDigits] = useState(["", "", "", "", "", ""]);
@@ -19,8 +20,8 @@ export default function VerifyPhone() {
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
-    if (!userId) navigate("/register", { replace: true });
-  }, [userId, navigate]);
+    if (!token) navigate("/register", { replace: true });
+  }, [token, navigate]);
 
   useEffect(() => {
     inputsRef.current[0]?.focus();
@@ -50,13 +51,14 @@ export default function VerifyPhone() {
 
   const handleVerify = async (code?: string) => {
     const otp = code || digits.join("");
-    if (otp.length !== 6 || !userId) return;
+    if (otp.length !== 6 || !token) return;
 
     setLoading(true);
     setError("");
     try {
-      await authApi.verifyOtp(userId, otp);
-      navigate("/login?verified=true");
+      const res = await authApi.verifyOtp(token, otp);
+      setAuth(res.data.user, res.data.token);
+      navigate("/home");
     } catch (err: any) {
       const msg = err?.response?.data?.error || err?.response?.data?.message || "Invalid or expired code";
       setError(msg);
@@ -68,11 +70,11 @@ export default function VerifyPhone() {
   };
 
   const handleResend = async () => {
-    if (!userId) return;
+    if (!token) return;
     setResending(true);
     setError("");
     try {
-      await authApi.sendOtp(userId);
+      await authApi.sendOtp(token);
       setMessage("New code sent to your phone!");
       setTimeout(() => setMessage(""), 4000);
     } catch {
@@ -83,11 +85,11 @@ export default function VerifyPhone() {
   };
 
   const handleEmailOtp = async () => {
-    if (!userId) return;
+    if (!token) return;
     setEmailSending(true);
     setError("");
     try {
-      await authApi.sendOtpEmail(userId);
+      await authApi.sendOtpEmail(token);
       setMessage("Code sent to your email!");
       setTimeout(() => setMessage(""), 4000);
     } catch {
