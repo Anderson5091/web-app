@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthService } from "../../features/auth/services/auth.service";
-import { useAuthStore } from "../../features/auth/auth.store";
 import Input from "../../components/ui/Input";
 import GradientButton from "../../components/ui/GradientButton";
 
 export default function Register() {
   const navigate = useNavigate();
-  const setAuth = useAuthStore((state) => state.setAuth);
   const [apiError, setApiError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("");
@@ -37,8 +35,7 @@ export default function Register() {
     setApiError(null);
     try {
       const res = await AuthService.register({ email: email.trim().toLowerCase(), phone: phone.trim(), fullName: name.trim(), password });
-      setAuth(res.user, res.token);
-      navigate("/home", { replace: true });
+      navigate(`/verify-phone?token=${encodeURIComponent(res.token)}&phone=${encodeURIComponent(res.phone || "")}`);
     } catch (err: any) {
       const message = err?.response?.data?.error || err?.response?.data?.message || err?.message || "Registration failed";
       setApiError(message);
