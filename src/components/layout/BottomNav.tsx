@@ -1,8 +1,8 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Wallet, Send, Users, Settings } from "lucide-react";
+import { Home, Wallet, Send, Users, Settings } from "lucide-react";
 
 const NAV_ITEMS = [
-  { path: "/home", icon: LayoutDashboard, label: "Home" },
+  { path: "/home", icon: Home, label: "Home" },
   { path: "/wallet", icon: Wallet, label: "Wallet" },
   { path: "/wallet/transfer", icon: Send, label: "Send", center: true },
   { path: "/beneficiaries", icon: Users, label: "Recipients" },
