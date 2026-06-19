@@ -90,6 +90,10 @@ export default function Deposit() {
     setTimeout(() => setter(false), 2000);
   };
 
+  const qrData = depositStatus?.address
+    ? `${depositStatus.address}?amount=${parsedAmount.toFixed(2)}`
+    : "";
+
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
     const sec = s % 60;
@@ -131,7 +135,7 @@ export default function Deposit() {
             return (
               <button
                 key={net.key}
-                onClick={() => setSelectedNetwork(net)}
+                onClick={() => { setSelectedNetwork(net); setStep("amount"); }}
                 className={`w-full bg-card rounded-xl p-4 border mb-3 text-left transition-colors ${
                   isSelected ? "border-primary-border" : "border-border"
                 }`}
@@ -154,13 +158,6 @@ export default function Deposit() {
               Only send USDT to the matching network address. Sending the wrong token or using the wrong network may result in permanent loss of funds.
             </p>
           </div>
-          <button
-            onClick={() => setStep("amount")}
-            disabled={!selectedNetwork}
-            className="w-full mt-6 p-3 rounded-md bg-primary text-white font-semibold text-sm disabled:opacity-40"
-          >
-            Continue
-          </button>
         </div>
       </div>
     );
@@ -225,7 +222,7 @@ export default function Deposit() {
             disabled={!isValid || creating}
             className="w-full mt-6 p-3 rounded-md bg-primary text-white font-semibold text-sm disabled:opacity-40 flex items-center justify-center gap-2"
           >
-            {creating ? <><Loader size={16} className="animate-spin" /> Generating...</> : "Generate Deposit Address"}
+            {creating ? <><Loader size={16} className="animate-spin" /> Generating...</> : "Create Deposit Address"}
           </button>
         </div>
       </div>
@@ -277,7 +274,7 @@ export default function Deposit() {
           </div>
           <div className="flex justify-center p-4 bg-card rounded-xl border border-border mb-4">
             <div className="p-3 bg-white rounded-lg">
-              <QRCodeSVG value={depositStatus.address!} size={200} level="M" includeMargin />
+              <QRCodeSVG value={qrData} size={200} level="M" includeMargin />
             </div>
           </div>
           <div className="bg-card rounded-xl p-4 border border-border space-y-2">
