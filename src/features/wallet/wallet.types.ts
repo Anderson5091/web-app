@@ -26,13 +26,28 @@ export interface DepositRequest {
   address: string;
 }
 
+export interface DepositStatus {
+  depositId: string;
+  network: string;
+  amount: string | null;
+  fee: string | null;
+  netAmount: string | null;
+  txHash: string | null;
+  confirmations: number;
+  status: string;
+  address: string | null;
+  addressStatus: string | null;
+  expiresAt: string | null;
+  createdAt: string;
+}
+
 export interface Transaction {
   id: string;
   type: "DEPOSIT" | "WITHDRAWAL" | "TRANSFER";
   amount: string;
   network: string;
   txHash?: string;
-  status: "PENDING" | "COMPLETED" | "FAILED";
+  status: "PENDING" | "DETECTED" | "COMPLETED" | "FAILED";
   createdAt: string;
 }
 

@@ -22,7 +22,7 @@ export default function Transactions() {
 
   const filtered = transactions.filter((tx) => {
     if (filter === "all") return true;
-    if (filter === "pending") return tx.status === "PENDING";
+    if (filter === "pending") return tx.status === "PENDING" || tx.status === "DETECTED";
     if (filter === "completed") return tx.status === "COMPLETED";
     if (filter === "failed") return tx.status === "FAILED";
     return true;

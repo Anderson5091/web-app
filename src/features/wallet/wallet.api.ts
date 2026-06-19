@@ -1,5 +1,5 @@
 import { api } from "../../api/client";
-import type { Wallet, DepositAddress, Transaction, DepositRequest, WithdrawalResponse } from "./wallet.types";
+import type { Wallet, DepositAddress, Transaction, DepositRequest, WithdrawalResponse, DepositStatus } from "./wallet.types";
 
 export const walletApi = {
   getWallet: () => api.get<Wallet>("/wallet"),
@@ -16,6 +16,9 @@ export const walletApi = {
 
   createDeposit: (data: { chain: string; token?: string }) =>
     api.post<DepositRequest>("/deposits/create", data),
+
+  getDepositStatus: (depositId: string) =>
+    api.get<DepositStatus>(`/deposits/${depositId}/status`),
 
   internalTransfer: (data: { recipientEmail: string; amount: string }) =>
     api.post("/wallet/internal-transfer", {
