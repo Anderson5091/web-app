@@ -131,7 +131,7 @@ export default function Sidebar() {
         <div className="flex items-center gap-3 px-3 py-2">
           <div className="w-8 h-8 rounded-full bg-primary-dim border border-primary-border flex items-center justify-center">
             <span className="text-primary text-xs font-bold">
-              {user?.name?.[0] || user?.email?.[0]?.toUpperCase() || "U"}
+              {user?.fullName?.[0] || user?.email?.[0]?.toUpperCase() || "U"}
             </span>
           </div>
           <div className="flex-1 min-w-0">

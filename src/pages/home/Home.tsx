@@ -18,7 +18,7 @@ export default function Home() {
   }, [fetchWallet, fetchTransactions, fetchUnreadCount]);
 
   const recent = transactions.slice(0, 3);
-  const firstName = user?.name?.split(" ")[0] || "User";
+  const firstName = user?.fullName?.split(" ")[0] || "User";
 
   const quickActions = [
     { icon: ArrowDownLeft, label: "Add Funds",  onPress: () => navigate("/wallet/deposit"),      color: "#0084FF" },
@@ -34,7 +34,7 @@ export default function Home() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <div className="w-11 h-11 rounded-full bg-primary-dim border border-primary-border flex items-center justify-center shrink-0">
-              <span className="text-primary text-lg font-bold">{firstName[0]}</span>
+              <span className="text-primary text-lg font-bold">{(user?.fullName?.[0] || user?.email?.[0] || "U").toUpperCase()}</span>
             </div>
             <div>
               <p className="text-text-secondary text-sm">Good morning,</p>
