@@ -74,11 +74,23 @@ export default function Deposit() {
         chain: selectedNetwork.key,
       });
       setDepositId(result.depositId);
-      const status = await WalletService.getDepositStatus(result.depositId);
-      setDepositStatus(status);
+      setDepositStatus({
+        depositId: result.depositId,
+        network: result.network,
+        amount: parsedAmount.toFixed(2),
+        fee: fee.toFixed(2),
+        netAmount: netAmount.toFixed(2),
+        txHash: null,
+        confirmations: 0,
+        status: "WALLET_CREATED",
+        address: result.address,
+        addressStatus: "CREATED",
+        expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+        createdAt: new Date().toISOString(),
+      });
       setStep("address");
-    } catch {
-      /* ignore */
+    } catch (error) {
+      console.error("Failed to create deposit:", error);
     } finally {
       setCreating(false);
     }
