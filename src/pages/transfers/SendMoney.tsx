@@ -77,7 +77,7 @@ export default function SendMoney() {
               </div>
             </div>
             <div className="flex gap-2 items-center">
-              {[1, 2, 3].map((s) => (
+              {[1, 2, 3, 4].map((s) => (
                 <div
                   key={s}
                   className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
