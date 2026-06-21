@@ -129,7 +129,7 @@ export default function Deposit() {
     return (
       <div className="min-h-screen bg-app-bg flex flex-col">
         <div className="flex items-center gap-3 p-4 pb-2">
-          <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-card flex items-center justify-center">
+          <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-card flex items-center justify-center hover:border-primary/30 transition-colors">
             <ArrowLeft size={20} className="text-text-primary" />
           </button>
           <div>
@@ -152,7 +152,7 @@ export default function Deposit() {
                 key={net.key}
                 onClick={() => { setSelectedNetwork(net); setStep("amount"); }}
                 className={`w-full bg-card rounded-xl p-4 border mb-3 text-left transition-colors ${
-                  isSelected ? "border-primary-border" : "border-border"
+                  isSelected ? "border-primary-border" : "border-border hover:border-primary/30"
                 }`}
               >
                 <div className="flex items-center gap-4">
@@ -183,7 +183,7 @@ export default function Deposit() {
     return (
       <div className="min-h-screen bg-app-bg flex flex-col">
         <div className="flex items-center gap-3 p-4 pb-2">
-          <button onClick={() => setStep("network")} className="w-10 h-10 rounded-full bg-card flex items-center justify-center">
+          <button onClick={() => setStep("network")} className="w-10 h-10 rounded-full bg-card flex items-center justify-center hover:border-primary/30 transition-colors">
             <ArrowLeft size={20} className="text-text-primary" />
           </button>
           <div>
@@ -241,7 +241,7 @@ export default function Deposit() {
           <button
             onClick={handleCreateDeposit}
             disabled={!isValid || creating}
-            className="w-full mt-4 p-3 rounded-md bg-primary text-white font-semibold text-sm disabled:opacity-40 flex items-center justify-center gap-2"
+            className="w-full mt-4 p-3 rounded-md bg-primary text-white font-semibold text-sm disabled:opacity-40 hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
           >
             {creating ? <><Loader size={16} className="animate-spin" /> Generating...</> : "Create Deposit Address"}
           </button>
@@ -254,7 +254,7 @@ export default function Deposit() {
     return (
       <div className="min-h-screen bg-app-bg flex flex-col">
         <div className="flex items-center gap-3 p-4 pb-2">
-          <button onClick={() => navigate("/wallet", { replace: true })} className="w-10 h-10 rounded-full bg-card flex items-center justify-center">
+          <button onClick={() => navigate("/wallet", { replace: true })} className="w-10 h-10 rounded-full bg-card flex items-center justify-center hover:border-primary/30 transition-colors">
             <ArrowLeft size={20} className="text-text-primary" />
           </button>
           <div>
@@ -337,7 +337,7 @@ export default function Deposit() {
     return (
       <div className="min-h-screen bg-app-bg flex flex-col">
         <div className="flex items-center gap-3 p-4 pb-2">
-          <button onClick={() => navigate("/wallet", { replace: true })} className="w-10 h-10 rounded-full bg-card flex items-center justify-center">
+          <button onClick={() => navigate("/wallet", { replace: true })} className="w-10 h-10 rounded-full bg-card flex items-center justify-center hover:border-primary/30 transition-colors">
             <ArrowLeft size={20} className="text-text-primary" />
           </button>
           <div>
@@ -455,7 +455,7 @@ export default function Deposit() {
           </div>
           <button
             onClick={() => navigate("/wallet", { replace: true })}
-            className="w-full p-3 rounded-md bg-primary text-white font-semibold text-sm"
+            className="w-full p-3 rounded-md bg-primary text-white font-semibold text-sm hover:opacity-90 transition-opacity"
           >
             Back to Wallet
           </button>
