@@ -4,11 +4,13 @@ import ProfileSetup from "../pages/onboarding/ProfileSetup";
 import ProtectedRoute from "../components/guards/ProtectedRoute";
 import WalletHome from "../pages/wallet/WalletHome";
 import Deposit from "../pages/wallet/Deposit";
+import DepositTracker from "../pages/deposit/DepositTracker";
 import Withdraw from "../pages/wallet/Withdraw";
 import Transactions from "../pages/wallet/Transactions";
 import Beneficiaries from "../pages/beneficiaries/Beneficiaries";
 import SendMoney from "../pages/transfers/SendMoney";
 import PayoutTracker from "../pages/payout/PayoutTracker";
+import WithdrawalTracker from "../pages/withdrawal/WithdrawalTracker";
 
 import ComplianceCenter from "../pages/compliance/ComplianceCenter";
 import KYC from "../pages/compliance/KYC";
@@ -85,10 +87,26 @@ export const protectedRoutes: RouteObject[] = [
     ),
   },
   {
+    path: "/deposit/:id",
+    element: (
+      <ProtectedRoute>
+        <DepositTracker />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: "/payout/:id",
     element: (
       <ProtectedRoute>
         <PayoutTracker />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/withdrawal/:id",
+    element: (
+      <ProtectedRoute>
+        <WithdrawalTracker />
       </ProtectedRoute>
     ),
   },

@@ -1,5 +1,5 @@
 import { walletApi } from "./wallet.api";
-import type { Wallet, DepositAddress, Transaction, DepositRequest, WithdrawalResponse, DepositStatus } from "./wallet.types";
+import type { Wallet, DepositAddress, Transaction, DepositRequest, WithdrawalResponse, DepositStatus, WithdrawalDetail } from "./wallet.types";
 
 const USE_MOCK = false;
 
@@ -140,6 +140,26 @@ export const WalletService = {
       };
     }
     const res = await walletApi.getDepositStatus(depositId);
+    return res.data;
+  },
+
+  getWithdrawal: async (id: string): Promise<WithdrawalDetail> => {
+    if (USE_MOCK) {
+      await delay(500);
+      return {
+        id,
+        amount: 100,
+        fee: 1,
+        netAmount: 99,
+        chain: "BASE",
+        destinationAddress: "0xMockDestination...",
+        txHash: null,
+        explorerLink: null,
+        status: "PENDING",
+        createdAt: new Date().toISOString(),
+      };
+    }
+    const res = await walletApi.getWithdrawal(id);
     return res.data;
   },
 

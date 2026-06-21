@@ -41,6 +41,19 @@ export interface DepositStatus {
   createdAt: string;
 }
 
+export interface WithdrawalDetail {
+  id: string;
+  amount: number;
+  fee: number;
+  netAmount: number;
+  chain: string;
+  destinationAddress: string;
+  txHash: string | null;
+  explorerLink: string | null;
+  status: "PENDING" | "SENT" | "FAILED";
+  createdAt: string;
+}
+
 export interface Transaction {
   id: string;
   type: "DEPOSIT" | "WITHDRAWAL" | "TRANSFER";

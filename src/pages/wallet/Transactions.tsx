@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useWalletStore } from "../../features/wallet/wallet.store";
 import { ArrowDownLeft, ArrowUpRight, Send } from "lucide-react";
 import Loader from "../../components/ui/Loader";
@@ -15,6 +16,7 @@ const FILTERS: { key: FilterTab; label: string }[] = [
 export default function Transactions() {
   const { transactions, fetchTransactions, isLoading } = useWalletStore();
   const [filter, setFilter] = useState<FilterTab>("all");
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchTransactions();
@@ -74,7 +76,19 @@ export default function Transactions() {
               const isDeposit = tx.type === "DEPOSIT";
               const date = new Date(tx.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
               return (
-                <div key={tx.id} className="flex items-center gap-4 p-4 border-b border-border last:border-0 hover:bg-card-alt transition-colors">
+                <div
+                  key={tx.id}
+                  onClick={() => {
+                    if (isDeposit && tx.txHash) {
+                      navigate(`/deposit/${tx.txHash}`);
+                    } else if (tx.type === "WITHDRAWAL" && tx.txHash) {
+                      navigate(`/withdrawal/${tx.txHash}`);
+                    }
+                  }}
+                  className={`flex items-center gap-4 p-4 border-b border-border last:border-0 transition-colors ${
+                    tx.txHash ? "cursor-pointer hover:bg-card-alt" : ""
+                  }`}
+                >
                   <div className={`w-10 h-10 rounded-md flex items-center justify-center ${
                     isDeposit ? "bg-primary-dim" : tx.type === "WITHDRAWAL" ? "bg-danger-dim" : "bg-warning-dim"
                   }`}>

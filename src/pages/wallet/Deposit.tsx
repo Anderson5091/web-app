@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { Copy, Check, Info, TriangleAlert, ArrowLeft, Clock, ExternalLink, Loader } from "lucide-react";
+import { Copy, Check, Info, TriangleAlert, ArrowLeft, Clock, ExternalLink, Loader, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { WalletService } from "../../features/wallet/wallet.service";
 import type { DepositStatus } from "../../features/wallet/wallet.types";
@@ -26,6 +26,7 @@ export default function Deposit() {
   const [depositStatus, setDepositStatus] = useState<DepositStatus | null>(null);
   const [copied, setCopied] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(300);
   const [txHashCopied, setTxHashCopied] = useState(false);
 
@@ -69,6 +70,7 @@ export default function Deposit() {
   const handleCreateDeposit = async () => {
     if (!selectedNetwork || !amount) return;
     setCreating(true);
+    setError(null);
     try {
       const result = await WalletService.createDeposit({
         chain: selectedNetwork.key,
@@ -89,8 +91,9 @@ export default function Deposit() {
         createdAt: new Date().toISOString(),
       });
       setStep("address");
-    } catch (error) {
-      console.error("Failed to create deposit:", error);
+    } catch (error: any) {
+      const message = error?.response?.data?.error || error?.message || "Failed to create deposit. Please try again.";
+      setError(message);
     } finally {
       setCreating(false);
     }
@@ -203,7 +206,7 @@ export default function Deposit() {
             <input
               type="number"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e) => { setAmount(e.target.value); setError(null); }}
               placeholder="0.00"
               className="w-full bg-transparent text-text-primary text-3xl font-bold outline-none placeholder:text-text-subtle"
             />
@@ -229,10 +232,16 @@ export default function Deposit() {
               </div>
             </div>
           )}
+          {error && (
+            <div className="flex items-start gap-3 bg-danger-dim rounded-md p-3 border border-danger/30 mt-4">
+              <XCircle size={18} className="text-danger shrink-0 mt-0.5" />
+              <p className="text-danger text-sm">{error}</p>
+            </div>
+          )}
           <button
             onClick={handleCreateDeposit}
             disabled={!isValid || creating}
-            className="w-full mt-6 p-3 rounded-md bg-primary text-white font-semibold text-sm disabled:opacity-40 flex items-center justify-center gap-2"
+            className="w-full mt-4 p-3 rounded-md bg-primary text-white font-semibold text-sm disabled:opacity-40 flex items-center justify-center gap-2"
           >
             {creating ? <><Loader size={16} className="animate-spin" /> Generating...</> : "Create Deposit Address"}
           </button>
@@ -310,6 +319,12 @@ export default function Deposit() {
               Send the exact amount to the address above. Once detected, it may take a few minutes for network confirmations. The address expires in {formatTime(countdown)}.
             </p>
           </div>
+          <button
+            onClick={() => setStep("pending")}
+            className="w-full mt-4 p-3 rounded-md bg-primary text-white font-semibold text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          >
+            <Check size={18} /> I've Sent the Funds
+          </button>
         </div>
       </div>
     );
@@ -318,6 +333,7 @@ export default function Deposit() {
   if (step === "pending" && depositStatus) {
     const conf = depositStatus.confirmations || 0;
     const progress = Math.min(conf / REQUIRED_CONFIRMATIONS, 1);
+    const detected = depositStatus.status === "DETECTED" || depositStatus.status === "APPROVED" || depositStatus.status === "SWEPT" || depositStatus.status === "COMPLETED";
     return (
       <div className="min-h-screen bg-app-bg flex flex-col">
         <div className="flex items-center gap-3 p-4 pb-2">
@@ -326,35 +342,39 @@ export default function Deposit() {
           </button>
           <div>
             <h1 className="text-text-primary text-xl font-bold">Deposit Pending</h1>
-            <p className="text-text-secondary text-sm">Waiting for network confirmation</p>
+            <p className="text-text-secondary text-sm">{detected ? "Waiting for network confirmations" : "Awaiting transaction detection"}</p>
           </div>
         </div>
         <div className="flex-1 p-4 max-w-lg mx-auto w-full">
           <div className="bg-card rounded-xl p-6 border border-border text-center">
             <Loader size={40} className="text-primary animate-spin mx-auto mb-4" />
-            <p className="text-text-primary text-lg font-bold mb-1">Transaction Detected</p>
-            <p className="text-text-secondary text-sm mb-4">Waiting for network confirmations</p>
-            <div className="flex items-center justify-center gap-2 mb-4">
-              {Array.from({ length: REQUIRED_CONFIRMATIONS }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                    i < conf ? "bg-primary text-white" : "bg-card-alt text-text-subtle border border-border"
-                  }`}
-                >
-                  {i + 1}
+            <p className="text-text-primary text-lg font-bold mb-1">{detected ? "Transaction Detected" : "Awaiting Your Transaction"}</p>
+            <p className="text-text-secondary text-sm mb-4">{detected ? "Waiting for network confirmations" : "Please send the funds to the address shown earlier. We'll detect it automatically."}</p>
+            {detected && (
+              <>
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  {Array.from({ length: REQUIRED_CONFIRMATIONS }).map((_, i) => (
+                    <div
+                      key={i}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
+                        i < conf ? "bg-primary text-white" : "bg-card-alt text-text-subtle border border-border"
+                      }`}
+                    >
+                      {i + 1}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div className="w-full bg-card-alt rounded-full h-2 mb-4">
-              <div
-                className="bg-primary h-2 rounded-full transition-all duration-500"
-                style={{ width: `${progress * 100}%` }}
-              />
-            </div>
-            <p className="text-text-secondary text-sm">
-              Confirmations: <span className="text-text-primary font-semibold">{conf} / {REQUIRED_CONFIRMATIONS}</span>
-            </p>
+                <div className="w-full bg-card-alt rounded-full h-2 mb-4">
+                  <div
+                    className="bg-primary h-2 rounded-full transition-all duration-500"
+                    style={{ width: `${progress * 100}%` }}
+                  />
+                </div>
+                <p className="text-text-secondary text-sm">
+                  Confirmations: <span className="text-text-primary font-semibold">{conf} / {REQUIRED_CONFIRMATIONS}</span>
+                </p>
+              </>
+            )}
           </div>
           {depositStatus.txHash && (
             <div className="bg-card rounded-xl p-4 border border-border mt-4">
@@ -390,6 +410,12 @@ export default function Deposit() {
               <span className="text-text-primary font-medium">{depositStatus.network}</span>
             </div>
           </div>
+          <button
+            onClick={() => navigate(`/deposit/${depositId}`)}
+            className="w-full mt-4 p-3 rounded-md bg-card border border-border text-text-secondary font-semibold text-sm hover:border-text-subtle transition-colors flex items-center justify-center gap-2"
+          >
+            <ExternalLink size={14} /> Track in History
+          </button>
         </div>
       </div>
     );
@@ -432,6 +458,12 @@ export default function Deposit() {
             className="w-full p-3 rounded-md bg-primary text-white font-semibold text-sm"
           >
             Back to Wallet
+          </button>
+          <button
+            onClick={() => navigate("/wallet/transactions")}
+            className="w-full mt-2 p-3 rounded-md bg-card border border-border text-text-secondary font-semibold text-sm hover:border-text-subtle transition-colors"
+          >
+            View in History
           </button>
         </div>
       </div>
