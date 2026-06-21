@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useWalletStore } from "../../features/wallet/wallet.store";
-import { ArrowUpRight, Send, ArrowDownLeft, History, Plus, ArrowDown } from "lucide-react";
+import { ArrowUpRight, ArrowLeftRight, ArrowDownLeft, History, Plus, ArrowDown, Send } from "lucide-react";
 import Loader from "../../components/ui/Loader";
 
 const QUICK_ACTIONS = [
   { label: "Add Funds", icon: ArrowDownLeft, route: "/wallet/deposit", color: "#0084FF" },
-  { label: "Send", icon: Send, route: "/wallet/transfer", color: "#00D6A3" },
+  { label: "Transfer", icon: ArrowLeftRight, route: "/wallet/transfer", color: "#00D6A3" },
   { label: "Withdraw", icon: ArrowUpRight, route: "/wallet/withdraw", color: "#F5A623" },
   { label: "History", icon: History, route: "/wallet/transactions", color: "#A78BFA" },
 ];
