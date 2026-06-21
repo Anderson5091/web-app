@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBeneficiaryStore } from "../../features/beneficiaries/beneficiary.store";
 import { useWalletStore } from "../../features/wallet/wallet.store";
@@ -27,8 +27,10 @@ const STATUS_STEPS = [
 
 export default function SendMoney() {
   const navigate = useNavigate();
-  const { beneficiaries } = useBeneficiaryStore();
+  const { beneficiaries, fetchBeneficiaries } = useBeneficiaryStore();
   const { wallet } = useWalletStore();
+
+  useEffect(() => { fetchBeneficiaries(); }, [fetchBeneficiaries]);
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [amount, setAmount] = useState("");
