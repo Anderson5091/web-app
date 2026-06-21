@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useWalletStore } from "../../features/wallet/wallet.store";
-import { ArrowUpRight, Send, Copy, Check, ArrowDown, Plus } from "lucide-react";
+import { ArrowUpRight, Send, ArrowDownLeft, History, Plus, ArrowDown } from "lucide-react";
 import Loader from "../../components/ui/Loader";
 
-const MOCK_DEPOSIT_ADDRESSES = [
-  { network: "TRON", symbol: "TRC-20", address: "TQn7zKG5dHN4PL8JKnCWHkA5QvRmM2uXz", icon: "T" },
-  { network: "Ethereum", symbol: "ERC-20", address: "0x3f4d8c1a9B2e7f6D0cA4b8E3F1d2C5a6B7e8F9c", icon: "E" },
-  { network: "Polygon", symbol: "MATIC", address: "0x7aB1cD3e8F2a4B6C9d0E1f3A5b7C8d9E0f1A2b3", icon: "P" },
-  { network: "Solana", symbol: "SPL", address: "9xTzK3mRvL8nQpW2jB7cF4eH6iY1aU5oD0gN3kM", icon: "S" },
+const QUICK_ACTIONS = [
+  { label: "Add Funds", icon: ArrowDownLeft, route: "/wallet/deposit", color: "#0084FF" },
+  { label: "Send", icon: Send, route: "/wallet/transfer", color: "#00D6A3" },
+  { label: "Withdraw", icon: ArrowUpRight, route: "/wallet/withdraw", color: "#F5A623" },
+  { label: "History", icon: History, route: "/wallet/transactions", color: "#A78BFA" },
 ];
 
 const TX_TYPE_CONFIG: Record<string, { icon: React.ComponentType<{ size?: number; className?: string; color?: string; style?: React.CSSProperties }>; color: string }> = {
@@ -19,19 +20,13 @@ const TX_TYPE_CONFIG: Record<string, { icon: React.ComponentType<{ size?: number
 };
 
 export default function WalletHome() {
+  const navigate = useNavigate();
   const { wallet, transactions, fetchWallet, fetchTransactions, isLoading } = useWalletStore();
-  const [copiedAddr, setCopiedAddr] = useState("");
 
   useEffect(() => {
     fetchWallet();
     fetchTransactions();
   }, [fetchWallet, fetchTransactions]);
-
-  const copyAddress = async (address: string) => {
-    await navigator.clipboard.writeText(address);
-    setCopiedAddr(address);
-    setTimeout(() => setCopiedAddr(""), 2000);
-  };
 
   if (isLoading && !wallet) {
     return <Loader size="lg" className="min-h-[50vh]" text="Loading wallet..." />;
@@ -65,41 +60,28 @@ export default function WalletHome() {
           </div>
         </div>
 
-        {/* Deposit Addresses */}
-        <h3 className="text-text-primary text-lg font-semibold mb-1">Deposit Addresses</h3>
-        <p className="text-text-secondary text-xs mb-4">Send USDT to any address below — funds reflect within minutes.</p>
-
-        {MOCK_DEPOSIT_ADDRESSES.map((addr) => (
-          <div key={addr.network} className="flex items-center justify-between bg-card rounded-lg p-4 border border-border mb-2">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary-dim flex items-center justify-center">
-                <span className="text-primary text-lg font-bold">{addr.icon}</span>
-              </div>
-              <div>
-                <p className="text-text-primary text-sm font-semibold">{addr.network}</p>
-                <p className="text-text-subtle text-xs">{addr.symbol}</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-text-subtle text-xs font-mono">{addr.address.slice(0, 14)}...</p>
+        {/* Quick Actions */}
+        <h3 className="text-text-primary text-lg font-semibold mb-4">Quick Actions</h3>
+        <div className="grid grid-cols-4 gap-3 mb-6">
+          {QUICK_ACTIONS.map((a) => {
+            const Icon = a.icon;
+            return (
               <button
-                onClick={() => copyAddress(addr.address)}
-                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded mt-1 text-xs ${
-                  copiedAddr === addr.address ? "bg-primary-dim text-primary" : "bg-card-alt text-text-secondary"
-                }`}
+                key={a.label}
+                onClick={() => navigate(a.route)}
+                className="flex flex-col items-center gap-2 bg-card rounded-lg p-4 border border-border hover:border-primary/30 transition-colors"
               >
-                {copiedAddr === addr.address ? (
-                  <><Check size={14} className="text-primary" /> Copied!</>
-                ) : (
-                  <><Copy size={14} /> Copy</>
-                )}
+                <div className="w-12 h-12 rounded-md flex items-center justify-center" style={{ backgroundColor: a.color + "20" }}>
+                  <Icon size={24} color={a.color} />
+                </div>
+                <span className="text-text-secondary text-[10px] font-medium text-center">{a.label}</span>
               </button>
-            </div>
-          </div>
-        ))}
+            );
+          })}
+        </div>
 
         {/* Transaction History */}
-        <h3 className="text-text-primary text-lg font-semibold mt-6 mb-4">Transaction History</h3>
+        <h3 className="text-text-primary text-lg font-semibold mb-4">Transaction History</h3>
         <div className="bg-card rounded-lg border border-border p-4">
           {transactions.length === 0 ? (
             <p className="text-text-subtle text-sm text-center py-8">No transactions yet</p>
