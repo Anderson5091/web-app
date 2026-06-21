@@ -122,9 +122,9 @@ export default function Home() {
           })}
         </div>
 
-        {/* Transfer History */}
+        {/* Recent Transfers */}
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-text-primary text-lg font-semibold">Transfer History</h3>
+          <h3 className="text-text-primary text-lg font-semibold">Recent Transfers</h3>
           <button onClick={() => navigate("/wallet/transactions")} className="text-primary text-sm font-medium">
             See All
           </button>
