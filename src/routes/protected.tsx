@@ -9,6 +9,7 @@ import Withdraw from "../pages/wallet/Withdraw";
 import Transactions from "../pages/wallet/Transactions";
 import Beneficiaries from "../pages/beneficiaries/Beneficiaries";
 import SendMoney from "../pages/transfers/SendMoney";
+import P2PTransfer from "../pages/transfers/P2PTransfer";
 import PayoutTracker from "../pages/payout/PayoutTracker";
 import WithdrawalTracker from "../pages/withdrawal/WithdrawalTracker";
 
@@ -75,6 +76,14 @@ export const protectedRoutes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <Beneficiaries />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/wallet/p2p",
+    element: (
+      <ProtectedRoute>
+        <P2PTransfer />
       </ProtectedRoute>
     ),
   },

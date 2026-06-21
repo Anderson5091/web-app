@@ -6,7 +6,7 @@ import Loader from "../../components/ui/Loader";
 
 const QUICK_ACTIONS = [
   { label: "Add Funds", icon: ArrowDownLeft, route: "/wallet/deposit", color: "#0084FF" },
-  { label: "Transfer", icon: ArrowLeftRight, route: "/wallet/transfer", color: "#00D6A3" },
+  { label: "Transfer", icon: ArrowLeftRight, route: "/wallet/p2p", color: "#00D6A3" },
   { label: "Withdraw", icon: ArrowUpRight, route: "/wallet/withdraw", color: "#F5A623" },
   { label: "History", icon: History, route: "/wallet/transactions", color: "#A78BFA" },
 ];
