@@ -71,59 +71,56 @@ export default function Transactions() {
             </p>
           </div>
         ) : (
-          <div className="bg-card rounded-lg border border-border overflow-hidden">
-            {filtered.map((tx) => {
-              const isDeposit = tx.type === "DEPOSIT";
-              const date = new Date(tx.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
-              return (
-                <div
-                  key={tx.id}
-                  onClick={() => {
-                    if (isDeposit && tx.txHash) {
-                      navigate(`/deposit/${tx.txHash}`);
-                    } else if (tx.type === "WITHDRAWAL" && tx.txHash) {
-                      navigate(`/withdrawal/${tx.txHash}`);
-                    }
-                  }}
-                  className={`flex items-center gap-4 p-4 border-b border-border last:border-0 transition-colors ${
-                    tx.txHash ? "cursor-pointer hover:bg-card-alt" : ""
-                  }`}
-                >
-                  <div className={`w-10 h-10 rounded-md flex items-center justify-center ${
-                    isDeposit ? "bg-primary-dim" : tx.type === "WITHDRAWAL" ? "bg-danger-dim" : "bg-warning-dim"
-                  }`}>
-                    {isDeposit ? (
-                      <ArrowDownLeft size={20} className="text-primary" />
-                    ) : tx.type === "WITHDRAWAL" ? (
-                      <ArrowUpRight size={20} className="text-danger" />
-                    ) : (
-                      <Send size={20} className="text-warning" />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-text-primary text-sm font-semibold capitalize">
-                      {tx.type.toLowerCase()}
-                    </p>
-                    <p className="text-text-subtle text-xs mt-0.5">{date} · {tx.status}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className={`text-sm font-bold ${isDeposit ? "text-primary" : "text-danger"}`}>
-                      {isDeposit ? "+" : "-"}${tx.amount}
-                    </p>
-                    <span className={`inline-block px-2 py-0.5 text-[10px] font-semibold rounded-full mt-1 ${
-                      tx.status === "COMPLETED"
-                        ? "bg-primary-dim text-primary"
-                        : tx.status === "PENDING"
-                        ? "bg-warning-dim text-warning"
-                        : "bg-danger-dim text-danger"
-                    }`}>
-                      {tx.status}
-                    </span>
-                  </div>
+          filtered.map((tx) => {
+            const isDeposit = tx.type === "DEPOSIT";
+            const date = new Date(tx.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+            return (
+              <div
+                key={tx.id}
+                onClick={() => {
+                  if (isDeposit && tx.txHash) {
+                    navigate(`/deposit/${tx.txHash}`);
+                  } else if (tx.type === "WITHDRAWAL" && tx.txHash) {
+                    navigate(`/withdrawal/${tx.txHash}`);
+                  }
+                }}
+                className={`flex items-center gap-4 p-4 bg-card rounded-lg border border-border mb-2 transition-colors ${
+                  tx.txHash ? "cursor-pointer hover:bg-card-alt" : ""
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-md flex items-center justify-center ${
+                  isDeposit ? "bg-primary-dim" : tx.type === "WITHDRAWAL" ? "bg-danger-dim" : "bg-warning-dim"
+                }`}>
+                  {isDeposit
+                    ? <ArrowDownLeft size={20} className="text-primary" />
+                    : tx.type === "WITHDRAWAL"
+                    ? <ArrowUpRight size={20} className="text-danger" />
+                    : <Send size={20} className="text-warning" />
+                  }
                 </div>
-              );
-            })}
-          </div>
+                <div className="flex-1">
+                  <p className="text-text-primary text-sm font-semibold capitalize">
+                    {tx.type.toLowerCase()}
+                  </p>
+                  <p className="text-text-subtle text-xs mt-0.5">{date} · {tx.status}</p>
+                </div>
+                <div className="text-right">
+                  <p className={`text-sm font-bold ${isDeposit ? "text-primary" : "text-danger"}`}>
+                    {isDeposit ? "+" : "-"}${tx.amount}
+                  </p>
+                  <span className={`inline-block px-2 py-0.5 text-[10px] font-semibold rounded-full mt-1 ${
+                    tx.status === "COMPLETED"
+                      ? "bg-primary-dim text-primary"
+                      : tx.status === "PENDING"
+                      ? "bg-warning-dim text-warning"
+                      : "bg-danger-dim text-danger"
+                  }`}>
+                    {tx.status}
+                  </span>
+                </div>
+              </div>
+            );
+          })
         )}
       </div>
     </div>
