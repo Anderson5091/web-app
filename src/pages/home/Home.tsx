@@ -17,7 +17,7 @@ export default function Home() {
     fetchUnreadCount();
   }, [fetchWallet, fetchTransactions, fetchUnreadCount]);
 
-  const recent = transactions.slice(0, 3);
+  const recent = transactions.slice(0, 10);
   const firstName = user?.fullName?.split(" ")[0] || "User";
 
   const quickActions = [
@@ -122,9 +122,9 @@ export default function Home() {
           })}
         </div>
 
-        {/* Recent Transfers */}
+        {/* Transfer History */}
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-text-primary text-lg font-semibold">Recent Transfers</h3>
+          <h3 className="text-text-primary text-lg font-semibold">Transfer History</h3>
           <button onClick={() => navigate("/wallet/transactions")} className="text-primary text-sm font-medium">
             See All
           </button>
@@ -137,29 +137,54 @@ export default function Home() {
             <p className="text-text-subtle text-sm mt-1">Start sending money to see your history here</p>
           </div>
         ) : (
-          recent.map((tx) => (
-            <div key={tx.id} className="flex items-center gap-4 bg-card rounded-lg border border-border p-4 mb-2">
-              <div className={`w-10 h-10 rounded-md flex items-center justify-center ${
-                tx.type === "DEPOSIT" ? "bg-primary-dim" : "bg-danger-dim"
-              }`}>
-                {tx.type === "DEPOSIT" ? (
-                  <ArrowDownLeft size={20} className="text-primary" />
-                ) : (
-                  <Send size={20} className="text-danger" />
-                )}
+          recent.map((tx) => {
+            const isDeposit = tx.type === "DEPOSIT";
+            return (
+              <div
+                key={tx.id}
+                onClick={() => {
+                  if (isDeposit && tx.txHash) {
+                    navigate(`/deposit/${tx.txHash}`);
+                  } else if (tx.type === "WITHDRAWAL" && tx.txHash) {
+                    navigate(`/withdrawal/${tx.txHash}`);
+                  }
+                }}
+                className={`flex items-center gap-4 bg-card rounded-lg border border-border p-4 mb-2 transition-colors ${
+                  tx.txHash ? "cursor-pointer hover:bg-card-alt" : ""
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-md flex items-center justify-center ${
+                  isDeposit ? "bg-primary-dim" : tx.type === "WITHDRAWAL" ? "bg-danger-dim" : "bg-warning-dim"
+                }`}>
+                  {isDeposit ? (
+                    <ArrowDownLeft size={20} className="text-primary" />
+                  ) : tx.type === "WITHDRAWAL" ? (
+                    <ArrowUpRight size={20} className="text-danger" />
+                  ) : (
+                    <Send size={20} className="text-warning" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="text-text-primary text-sm font-semibold capitalize">{tx.type.toLowerCase()}</p>
+                  <p className="text-text-subtle text-xs mt-0.5">{new Date(tx.createdAt).toLocaleDateString()} · {tx.status}</p>
+                </div>
+                <div className="text-right">
+                  <p className={`text-sm font-bold ${isDeposit ? "text-primary" : "text-danger"}`}>
+                    {isDeposit ? "+" : "-"}${tx.amount}
+                  </p>
+                  <span className={`inline-block px-2 py-0.5 text-[10px] font-semibold rounded-full mt-1 ${
+                    tx.status === "COMPLETED"
+                      ? "bg-primary-dim text-primary"
+                      : tx.status === "PENDING"
+                      ? "bg-warning-dim text-warning"
+                      : "bg-danger-dim text-danger"
+                  }`}>
+                    {tx.status}
+                  </span>
+                </div>
               </div>
-              <div className="flex-1">
-                <p className="text-text-primary text-sm font-semibold capitalize">{tx.type.toLowerCase()}</p>
-                <p className="text-text-subtle text-xs mt-0.5">{new Date(tx.createdAt).toLocaleDateString()}</p>
-              </div>
-              <div className="text-right">
-                <p className={`text-sm font-bold ${tx.type === "DEPOSIT" ? "text-primary" : "text-danger"}`}>
-                  {tx.type === "DEPOSIT" ? "+" : "-"}${tx.amount}
-                </p>
-                <p className="text-text-subtle text-[10px] uppercase font-semibold mt-0.5">{tx.status}</p>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
