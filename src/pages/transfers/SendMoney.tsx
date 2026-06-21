@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBeneficiaryStore } from "../../features/beneficiaries/beneficiary.store";
 import { useWalletStore } from "../../features/wallet/wallet.store";
+import { useTransferStore } from "../../features/transfers/transfer.store";
 import { ArrowLeft, Check, CheckCircle2, Shield } from "lucide-react";
 import GradientButton from "../../components/ui/GradientButton";
 import type { Beneficiary } from "../../features/beneficiaries/beneficiary.types";
@@ -29,12 +30,14 @@ export default function SendMoney() {
   const navigate = useNavigate();
   const { beneficiaries, fetchBeneficiaries } = useBeneficiaryStore();
   const { wallet } = useWalletStore();
+  const { submitTransfer } = useTransferStore();
 
   useEffect(() => { fetchBeneficiaries(); }, [fetchBeneficiaries]);
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
+  const [transferError, setTransferError] = useState("");
 
   const selectedBen = beneficiaries.find((b) => b.id === selectedId);
   const numAmount = parseFloat(amount) || 0;
@@ -233,9 +236,27 @@ export default function SendMoney() {
               </p>
             </div>
 
-            <GradientButton title="Confirm & Send" onPress={() => {
+            {transferError && (
+              <div className="mb-4 p-3 bg-danger-dim border border-danger/30 rounded-md text-sm text-danger font-medium">
+                {transferError}
+              </div>
+            )}
+            <GradientButton title="Confirm & Send" onPress={async () => {
+              if (!selectedBen) return;
               setLoading(true);
-              setTimeout(() => { setLoading(false); setStep(4); }, 1500);
+              setTransferError("");
+              try {
+                await submitTransfer({
+                  beneficiaryId: selectedBen.id,
+                  amount: numAmount,
+                  payoutMethod: selectedBen.payoutMethod as "BANK" | "MOBILE_MONEY" | "CASH_PICKUP",
+                });
+                setStep(4);
+              } catch (err: any) {
+                setTransferError(err?.response?.data?.error || err?.message || "Transfer failed");
+              } finally {
+                setLoading(false);
+              }
             }} loading={loading} />
           </>
         )}
