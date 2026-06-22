@@ -97,10 +97,12 @@ export default function WalletHome() {
                     navigate(`/deposit/${tx.txHash}`);
                   } else if (tx.type === "WITHDRAWAL" && tx.txHash) {
                     navigate(`/withdrawal/${tx.txHash}`);
+                  } else if (tx.type === "TRANSFER" && tx.payoutOrderId) {
+                    navigate(`/payout/${tx.payoutOrderId}`);
                   }
                 }}
                 className={`bg-card rounded-lg border border-border p-4 mb-2 transition-colors ${
-                  tx.txHash ? "cursor-pointer hover:bg-card-alt" : ""
+                  tx.txHash || (tx.type === "TRANSFER" && tx.payoutOrderId) ? "cursor-pointer hover:bg-card-alt" : ""
                 }`}
               >
                 <div className="flex items-center gap-4">
@@ -116,14 +118,17 @@ export default function WalletHome() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-text-primary text-sm font-semibold capitalize truncate">{tx.type.toLowerCase()}</p>
+                    <p className="text-text-primary text-sm font-semibold truncate">
+                      {tx.type === "TRANSFER" ? "Transfer" : tx.type.toLowerCase()}
+                      {tx.transactionNumber ? <span className="text-text-subtle text-xs ml-1 font-mono">#{tx.transactionNumber}</span> : null}
+                    </p>
                     <p className="text-text-subtle text-xs mt-0.5">
-                      {new Date(tx.createdAt).toLocaleDateString()} · {tx.status}
+                      {new Date(tx.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="text-right shrink-0">
                     <p className={`text-sm font-bold ${isDeposit ? "text-primary" : "text-danger"}`}>
-                      {isDeposit ? "+" : "-"}${tx.amount}
+                      {isDeposit ? "+" : "-"}${Number(tx.amount).toFixed(2)}
                     </p>
                     <span className={`inline-block px-2 py-0.5 text-[10px] font-semibold rounded-full mt-1 ${
                       tx.status === "COMPLETED"
@@ -132,7 +137,7 @@ export default function WalletHome() {
                         ? "bg-warning-dim text-warning"
                         : "bg-danger-dim text-danger"
                     }`}>
-                      {tx.status}
+                      {tx.status === "PENDING" && tx.type === "TRANSFER" ? "Pending (waiting for payout)" : tx.status}
                     </span>
                   </div>
                 </div>

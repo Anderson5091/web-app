@@ -35,7 +35,7 @@ export default function Register() {
     setApiError(null);
     try {
       const res = await AuthService.register({ email: email.trim().toLowerCase(), phone: phone.trim(), fullName: name.trim(), password });
-      navigate(`/verify-phone?token=${encodeURIComponent(res.token)}&phone=${encodeURIComponent(res.phone || "")}`);
+      navigate(`/verify-phone?userId=${encodeURIComponent(res.userId)}&phone=${encodeURIComponent(res.phone || "")}`);
     } catch (err: any) {
       const message = err?.response?.data?.error || err?.response?.data?.message || err?.message || "Registration failed";
       setApiError(message);

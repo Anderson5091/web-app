@@ -54,7 +54,7 @@ export default function Sidebar() {
   }, [fetchUnreadCount]);
 
   const isActive = (path: string) => {
-    if (path === "/home") return location.pathname === "/home";
+    if (path === "/home" || path === "/wallet") return location.pathname === path;
     return location.pathname.startsWith(path);
   };
 

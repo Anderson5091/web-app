@@ -2,11 +2,11 @@ import { api } from "./client";
 import type { LoginCredentials, RegisterCredentials } from "../types/auth.types";
 
 export const authApi = {
-  register: (data: RegisterCredentials) => api.post<{ token: string; phone: string | null; message: string }>("/auth/register", data),
+  register: (data: RegisterCredentials) => api.post<{ userId: string; phone: string | null; message: string }>("/auth/register", data),
   login: (data: LoginCredentials) => api.post<{ user: any; token: string; refreshToken: string }>("/auth/login", data),
-  sendOtp: (registrationToken: string) => api.post("/auth/send-otp", { token: registrationToken }),
-  sendOtpEmail: (registrationToken: string) => api.post("/auth/send-otp-email", { token: registrationToken }),
-  verifyOtp: (registrationToken: string, code: string) => api.post<{ user: any; token: string; refreshToken: string }>("/auth/verify-otp", { token: registrationToken, code }),
+  sendOtp: (userId: string) => api.post("/auth/send-otp", { userId }),
+  sendOtpEmail: (userId: string) => api.post("/auth/send-otp-email", { userId }),
+  verifyOtp: (userId: string, code: string) => api.post<{ user: any; token: string; refreshToken: string }>("/auth/verify-otp", { userId, code }),
   logout: () => api.post("/auth/logout"),
   refresh: () => api.post("/auth/refresh"),
   me: () => api.get("/auth/me"),

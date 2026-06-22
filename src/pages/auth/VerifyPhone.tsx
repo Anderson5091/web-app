@@ -8,7 +8,7 @@ export default function VerifyPhone() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const setAuth = useAuthStore((state) => state.setAuth);
-  const token = searchParams.get("token") || "";
+  const userId = searchParams.get("userId") || "";
   const phone = searchParams.get("phone");
 
   const [digits, setDigits] = useState(["", "", "", "", "", ""]);
@@ -20,8 +20,8 @@ export default function VerifyPhone() {
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
-    if (!token) navigate("/register", { replace: true });
-  }, [token, navigate]);
+    if (!userId) navigate("/register", { replace: true });
+  }, [userId, navigate]);
 
   useEffect(() => {
     inputsRef.current[0]?.focus();
@@ -51,12 +51,12 @@ export default function VerifyPhone() {
 
   const handleVerify = async (code?: string) => {
     const otp = code || digits.join("");
-    if (otp.length !== 6 || !token) return;
+    if (otp.length !== 6 || !userId) return;
 
     setLoading(true);
     setError("");
     try {
-      const res = await authApi.verifyOtp(token, otp);
+      const res = await authApi.verifyOtp(userId, otp);
       setAuth(res.data.user, res.data.token);
       navigate("/home");
     } catch (err: any) {
@@ -70,11 +70,11 @@ export default function VerifyPhone() {
   };
 
   const handleResend = async () => {
-    if (!token) return;
+    if (!userId) return;
     setResending(true);
     setError("");
     try {
-      await authApi.sendOtp(token);
+      await authApi.sendOtp(userId);
       setMessage("New code sent to your phone!");
       setTimeout(() => setMessage(""), 4000);
     } catch {
@@ -85,11 +85,11 @@ export default function VerifyPhone() {
   };
 
   const handleEmailOtp = async () => {
-    if (!token) return;
+    if (!userId) return;
     setEmailSending(true);
     setError("");
     try {
-      await authApi.sendOtpEmail(token);
+      await authApi.sendOtpEmail(userId);
       setMessage("Code sent to your email!");
       setTimeout(() => setMessage(""), 4000);
     } catch {
@@ -104,7 +104,7 @@ export default function VerifyPhone() {
       <div className="w-full max-w-md mx-auto">
         <h1 className="text-3xl font-bold text-text-primary mb-1.5">Verify Your Phone</h1>
         <p className="text-text-secondary text-base mb-1">
-          Enter the 6-digit code sent to {phone ? <span className="text-text-primary font-medium">{phone}</span> : <span className="text-text-primary font-medium">{email}</span>}
+          Enter the 6-digit code sent to {phone ? <span className="text-text-primary font-medium">{phone}</span> : <span className="text-text-primary font-medium">your phone</span>}
         </p>
         <p className="text-text-subtle text-xs mb-6">The code expires in 5 minutes</p>
 

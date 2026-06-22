@@ -81,10 +81,12 @@ export default function Transactions() {
                     navigate(`/deposit/${tx.txHash}`);
                   } else if (tx.type === "WITHDRAWAL" && tx.txHash) {
                     navigate(`/withdrawal/${tx.txHash}`);
+                  } else if (tx.type === "TRANSFER" && tx.payoutOrderId) {
+                    navigate(`/payout/${tx.payoutOrderId}`);
                   }
                 }}
                 className={`flex items-center gap-4 bg-card rounded-lg border border-border p-4 mb-2 transition-colors ${
-                  tx.txHash ? "cursor-pointer hover:bg-card-alt" : ""
+                  tx.txHash || (tx.type === "TRANSFER" && tx.payoutOrderId) ? "cursor-pointer hover:bg-card-alt" : ""
                 }`}
               >
                 <div className={`w-10 h-10 rounded-md flex items-center justify-center ${
@@ -99,21 +101,26 @@ export default function Transactions() {
                   )}
                 </div>
                 <div className="flex-1">
-                  <p className="text-text-primary text-sm font-semibold capitalize">{tx.type.toLowerCase()}</p>
-                  <p className="text-text-subtle text-xs mt-0.5">{new Date(tx.createdAt).toLocaleDateString()} · {tx.status}</p>
+                  <p className="text-text-primary text-sm font-semibold capitalize">
+                    {tx.type === "TRANSFER" ? "Transfer" : tx.type.toLowerCase()}
+                    {tx.transactionNumber ? <span className="text-text-subtle text-xs ml-2 font-mono">#{tx.transactionNumber}</span> : null}
+                  </p>
+                  <p className="text-text-subtle text-xs mt-0.5">{new Date(tx.createdAt).toLocaleDateString()}</p>
                 </div>
                 <div className="text-right">
                   <p className={`text-sm font-bold ${isDeposit ? "text-primary" : "text-danger"}`}>
-                    {isDeposit ? "+" : "-"}${tx.amount}
+                    {isDeposit ? "+" : "-"}${Number(tx.amount).toFixed(2)}
                   </p>
                   <span className={`inline-block px-2 py-0.5 text-[10px] font-semibold rounded-full mt-1 ${
                     tx.status === "COMPLETED"
                       ? "bg-primary-dim text-primary"
+                      : tx.status === "PENDING" && tx.type === "TRANSFER"
+                      ? "bg-warning-dim text-warning"
                       : tx.status === "PENDING"
                       ? "bg-warning-dim text-warning"
                       : "bg-danger-dim text-danger"
                   }`}>
-                    {tx.status}
+                    {tx.status === "PENDING" && tx.type === "TRANSFER" ? "Pending (waiting for payout)" : tx.status}
                   </span>
                 </div>
               </div>

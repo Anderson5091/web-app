@@ -17,7 +17,7 @@ export default function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-[0_-4px_20px_rgba(0,0,0,0.3)] z-50 md:hidden">
       <div className="flex items-center justify-around h-16 px-2">
         {NAV_ITEMS.map((item) => {
-          const isActive = location.pathname.startsWith(item.path);
+          const isActive = item.path === "/wallet" ? location.pathname === "/wallet" : location.pathname.startsWith(item.path);
           const Icon = item.icon;
 
           if (item.center) {

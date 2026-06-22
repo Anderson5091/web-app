@@ -57,10 +57,12 @@ export interface WithdrawalDetail {
 export interface Transaction {
   id: string;
   type: "DEPOSIT" | "WITHDRAWAL" | "TRANSFER";
-  amount: string;
+  amount: number;
   network: string;
   txHash?: string;
   status: "PENDING" | "DETECTED" | "COMPLETED" | "FAILED";
+  transactionNumber?: string;
+  payoutOrderId?: string;
   createdAt: string;
 }
 
