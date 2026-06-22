@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { transferApi } from "../../features/transfers/transfer.api";
-import type { Transfer } from "../../features/transfers/transfer.types";
-import { ArrowLeft, Check, CheckCircle2, Loader, Send } from "lucide-react";
+import type { Transfer, TransferStatus } from "../../features/transfers/transfer.types";
+import { ArrowLeft, Check, CheckCircle2, Loader, Send, XCircle } from "lucide-react";
 import GradientButton from "../../components/ui/GradientButton";
 
 const STATUS_STEPS = [
@@ -12,6 +12,18 @@ const STATUS_STEPS = [
   { key: "partner_processing", label: "Partner Processing" },
   { key: "delivered", label: "Delivered" },
 ];
+
+const STATUS_STEP_INDEX: Record<TransferStatus, number> = {
+  DRAFT: 0,
+  QUOTE_GENERATED: 0,
+  FUNDS_RESERVED: 0,
+  COMPLIANCE_CHECK: 1,
+  PENDING_PAYOUT: 2,
+  SENT_TO_PARTNER: 3,
+  DELIVERED: 4,
+  COMPLETED: 4,
+  FAILED: -1,
+};
 
 export default function TransferTracker() {
   const { id } = useParams<{ id: string }>();
@@ -52,6 +64,9 @@ export default function TransferTracker() {
     );
   }
 
+  const currentStep = STATUS_STEP_INDEX[transfer.status] ?? -1;
+  const isFailed = transfer.status === "FAILED";
+
   return (
     <div className="min-h-screen bg-app-bg">
       <div className="max-w-2xl mx-auto p-4">
@@ -64,27 +79,49 @@ export default function TransferTracker() {
         </button>
 
         <div className="flex flex-col items-center py-8">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-r from-[#00D6A3] to-[#0084FF] flex items-center justify-center mb-6">
-            <CheckCircle2 size={48} className="text-white" />
+          <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 ${
+            isFailed ? "bg-danger-dim" : "bg-gradient-to-r from-[#00D6A3] to-[#0084FF]"
+          }`}>
+            {isFailed ? (
+              <XCircle size={48} className="text-danger" />
+            ) : (
+              <CheckCircle2 size={48} className="text-white" />
+            )}
           </div>
-          <h2 className="text-text-primary text-3xl font-bold mb-2">Transfer Submitted!</h2>
+          <h2 className="text-text-primary text-3xl font-bold mb-2">
+            {isFailed ? "Transfer Failed" : "Transfer Submitted!"}
+          </h2>
           <p className="text-primary text-base font-semibold mb-3">
             ${Number(transfer.amount).toFixed(2)} USDT
           </p>
           <p className="text-text-secondary text-sm text-center leading-6 mb-8 max-w-sm">
-            Your transfer is now undergoing compliance review. You can track the status in real time.
+            {isFailed
+              ? "This transfer could not be completed. Please contact support."
+              : "Your transfer is now undergoing compliance review. You can track the status in real time."}
           </p>
 
           <div className="flex items-start gap-0 mb-8">
-            {STATUS_STEPS.map((s, i) => (
-              <div key={s.key} className="flex flex-col items-center w-14">
-                <div className="w-6 h-6 rounded-full flex items-center justify-center border-2 bg-primary border-primary">
-                  <Check size={12} className="text-white" />
+            {STATUS_STEPS.map((s, i) => {
+              const isDone = !isFailed && i <= currentStep;
+              const isActive = !isFailed && i === currentStep;
+              return (
+                <div key={s.key} className="flex flex-col items-center w-14">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${
+                    isDone ? "bg-primary border-primary" : "bg-card border-border"
+                  }`}>
+                    {isDone && <Check size={12} className="text-white" />}
+                  </div>
+                  {i < 4 && (
+                    <div className={`w-14 h-0.5 mt-[11px] -ml-0 ${
+                      !isFailed && i < currentStep ? "bg-primary" : "bg-border"
+                    }`} />
+                  )}
+                  <p className={`text-[9px] text-center mt-1 ${isActive ? "text-primary font-semibold" : isDone ? "text-primary" : "text-text-subtle"}`}>
+                    {s.label}
+                  </p>
                 </div>
-                {i < 4 && <div className="w-14 h-0.5 bg-primary mt-[11px] -ml-0" />}
-                <p className="text-[9px] text-center mt-1 text-primary">{s.label}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="w-full space-y-3">
@@ -109,8 +146,10 @@ export default function TransferTracker() {
             </div>
             <div className="flex justify-between items-center py-3">
               <span className="text-text-secondary text-sm">Status</span>
-              <span className="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-primary-dim text-primary">
-                Completed
+              <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
+                isFailed ? "bg-danger-dim text-danger" : "bg-primary-dim text-primary"
+              }`}>
+                {isFailed ? "Failed" : transfer.status === "COMPLETED" || transfer.status === "DELIVERED" ? "Completed" : "In Progress"}
               </span>
             </div>
           </div>
