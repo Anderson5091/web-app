@@ -2,7 +2,16 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { transferApi } from "../../features/transfers/transfer.api";
 import type { Transfer } from "../../features/transfers/transfer.types";
-import { ArrowLeft, Send, CheckCircle2, Loader } from "lucide-react";
+import { ArrowLeft, Check, CheckCircle2, Loader, Send } from "lucide-react";
+import GradientButton from "../../components/ui/GradientButton";
+
+const STATUS_STEPS = [
+  { key: "created", label: "Transfer Created" },
+  { key: "compliance_review", label: "Compliance Review" },
+  { key: "treasury", label: "Treasury" },
+  { key: "partner_processing", label: "Partner Processing" },
+  { key: "delivered", label: "Delivered" },
+];
 
 export default function TransferTracker() {
   const { id } = useParams<{ id: string }>();
@@ -54,24 +63,37 @@ export default function TransferTracker() {
           <span className="text-sm font-medium">Back to Transactions</span>
         </button>
 
-        <div className="bg-card rounded-xl border border-border p-6 mb-4">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-full bg-primary-dim flex items-center justify-center">
-              <Send size={24} className="text-primary" />
-            </div>
-            <div>
-              <h1 className="text-text-primary text-xl font-bold">Transfer Details</h1>
-              <p className="text-text-subtle text-sm">
-                {transfer.createdAt ? new Date(transfer.createdAt).toLocaleDateString() : ""}
-              </p>
-            </div>
+        <div className="flex flex-col items-center py-8">
+          <div className="w-24 h-24 rounded-full bg-gradient-to-r from-[#00D6A3] to-[#0084FF] flex items-center justify-center mb-6">
+            <CheckCircle2 size={48} className="text-white" />
+          </div>
+          <h2 className="text-text-primary text-3xl font-bold mb-2">Transfer Submitted!</h2>
+          <p className="text-primary text-base font-semibold mb-3">
+            ${Number(transfer.amount).toFixed(2)} USDT
+          </p>
+          <p className="text-text-secondary text-sm text-center leading-6 mb-8 max-w-sm">
+            Your transfer is now undergoing compliance review. You can track the status in real time.
+          </p>
+
+          <div className="flex items-start gap-0 mb-8">
+            {STATUS_STEPS.map((s, i) => (
+              <div key={s.key} className="flex flex-col items-center w-14">
+                <div className="w-6 h-6 rounded-full flex items-center justify-center border-2 bg-primary border-primary">
+                  <Check size={12} className="text-white" />
+                </div>
+                {i < 4 && <div className="w-14 h-0.5 bg-primary mt-[11px] -ml-0" />}
+                <p className="text-[9px] text-center mt-1 text-primary">{s.label}</p>
+              </div>
+            ))}
           </div>
 
-          <div className="flex items-center gap-2 mb-6">
-            <CheckCircle2 size={18} className="text-primary" />
-            <span className="text-primary text-sm font-semibold">Completed</span>
+          <div className="w-full space-y-3">
+            <GradientButton title="View Transactions" onPress={() => navigate("/wallet/transactions")} />
+            <GradientButton title="Back to Dashboard" variant="outline" onPress={() => navigate("/home")} />
           </div>
+        </div>
 
+        <div className="bg-card rounded-xl border border-border p-6 mt-4">
           <div className="space-y-4">
             <div className="flex justify-between items-center py-3 border-b border-border">
               <span className="text-text-secondary text-sm">Reference</span>
