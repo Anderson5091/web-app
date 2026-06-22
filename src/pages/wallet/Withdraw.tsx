@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { ArrowUpRight, AlertCircle, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
 import { useWalletStore } from "../../features/wallet/wallet.store";
 import { WalletService } from "../../features/wallet/wallet.service";
+import GradientButton from "../../components/ui/GradientButton";
 import type { WithdrawalResponse } from "../../features/wallet/wallet.types";
 
 const NETWORKS = ["BASE", "ETHEREUM", "POLYGON", "SOLANA"];
@@ -14,6 +16,7 @@ const FEE_SCHEDULE: Record<string, number> = {
 };
 
 export default function Withdraw() {
+  const navigate = useNavigate();
   const { wallet } = useWalletStore();
   const [network, setNetwork] = useState("BASE");
   const [address, setAddress] = useState("");
@@ -53,103 +56,104 @@ export default function Withdraw() {
 
   if (withdrawalResult) {
     return (
-      <div className="p-4 md:p-6 max-w-lg mx-auto h-[60vh] flex flex-col items-center justify-center space-y-6">
-        <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center animate-bounce shadow-sm">
-          <ArrowUpRight size={40} />
-        </div>
-        <h2 className="text-2xl font-bold text-gray-900 text-center">
-          Withdrawal Submitted
-        </h2>
-        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 w-full max-w-sm space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-gray-500">Amount</span>
-            <span className="font-medium">
-              ${withdrawalResult.amount.toFixed(2)} USDT
-            </span>
+      <div className="min-h-screen bg-app-bg flex flex-col">
+        <div className="flex-1 p-4 max-w-lg mx-auto w-full flex flex-col items-center justify-center text-center">
+          <div className="w-24 h-24 rounded-full bg-gradient-to-r from-[#00D6A3] to-[#0084FF] flex items-center justify-center mb-6">
+            <CheckCircle2 size={48} className="text-white" />
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-500">Fee</span>
-            <span className="font-medium">
-              ${withdrawalResult.fee.toFixed(2)} USDT
-            </span>
-          </div>
-          <div className="flex justify-between pt-2 border-t border-gray-200">
-            <span className="text-gray-700 font-medium">Net Transfer</span>
-            <span className="font-bold text-gray-900">
-              ${withdrawalResult.netAmount.toFixed(2)} USDT
-            </span>
-          </div>
-          {withdrawalResult.txHash && (
-            <div className="pt-2 border-t border-gray-200">
-              <span className="text-gray-500 block mb-1">Transaction Hash</span>
-              <span className="font-mono text-xs break-all text-gray-600">
-                {withdrawalResult.txHash}
+          <h2 className="text-text-primary text-3xl font-bold mb-2">
+            Withdrawal Submitted!
+          </h2>
+          <p className="text-primary text-base font-semibold mb-6">
+            {withdrawalResult.amount.toFixed(2)} USDT withdrawn
+          </p>
+          <div className="bg-card rounded-xl p-4 border border-border w-full space-y-2 mb-6">
+            <div className="flex justify-between text-sm">
+              <span className="text-text-secondary">Amount</span>
+              <span className="text-text-primary font-medium">
+                {withdrawalResult.amount.toFixed(2)} USDT
               </span>
             </div>
-          )}
+            <div className="flex justify-between text-sm">
+              <span className="text-text-secondary">Fee</span>
+              <span className="text-text-primary font-medium">
+                {withdrawalResult.fee.toFixed(2)} USDT
+              </span>
+            </div>
+            <div className="flex justify-between text-sm pt-2 border-t border-border">
+              <span className="text-text-primary font-medium">Net Transfer</span>
+              <span className="text-primary font-bold">
+                {withdrawalResult.netAmount.toFixed(2)} USDT
+              </span>
+            </div>
+            {withdrawalResult.txHash && (
+              <div className="pt-2 border-t border-border">
+                <span className="text-text-secondary text-sm block mb-1">Transaction Hash</span>
+                <span className="text-text-primary font-mono text-xs break-all">
+                  {withdrawalResult.txHash}
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="w-full space-y-3">
+            <GradientButton title="Make Another Withdrawal" onPress={() => setWithdrawalResult(null)} />
+            <GradientButton title="Back to Wallet" variant="outline" onPress={() => navigate("/wallet")} />
+          </div>
         </div>
-        <button
-          onClick={() => setWithdrawalResult(null)}
-          className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold shadow hover:bg-blue-700 transition"
-        >
-          Make Another Withdrawal
-        </button>
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-6 max-w-lg mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Withdraw USDT</h1>
+    <div className="min-h-screen bg-app-bg flex flex-col">
+      <div className="max-w-lg mx-auto w-full p-4">
+        <div className="flex items-center gap-3 mb-6">
+          <button onClick={() => navigate("/wallet")} className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center hover:bg-card-alt">
+            <ArrowLeft size={18} className="text-text-primary" />
+          </button>
+          <div>
+            <h1 className="text-text-primary text-xl font-bold">Withdraw USDT</h1>
+            <p className="text-text-secondary text-sm">Withdraw to an external wallet</p>
+          </div>
+        </div>
 
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-6">
         {error && (
-          <div className="p-4 bg-red-50 text-red-700 rounded-xl flex items-start gap-3">
-            <AlertCircle size={20} className="shrink-0 mt-0.5" />
-            <span className="text-sm">{error}</span>
+          <div className="flex items-start gap-3 bg-danger-dim rounded-md p-3 border border-danger/30 mb-4">
+            <XCircle size={18} className="text-danger shrink-0 mt-0.5" />
+            <p className="text-danger text-sm">{error}</p>
           </div>
         )}
 
-        <form onSubmit={handleWithdraw} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Network
-            </label>
+        <form onSubmit={handleWithdraw} className="space-y-4">
+          <div className="bg-card rounded-xl p-4 border border-border">
+            <label className="block text-text-secondary text-sm font-medium mb-2">Network</label>
             <select
               value={network}
               onChange={(e) => setNetwork(e.target.value)}
-              className="w-full border-gray-200 rounded-xl p-3 bg-gray-50 text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              className="w-full bg-card-alt border border-border rounded-md px-4 py-3 text-text-primary outline-none focus:border-primary appearance-none"
             >
               {NETWORKS.map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
+                <option key={n} value={n}>{n}</option>
               ))}
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Destination Address
-            </label>
+          <div className="bg-card rounded-xl p-4 border border-border">
+            <label className="block text-text-secondary text-sm font-medium mb-2">Destination Address</label>
             <input
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder={`Enter ${network} address`}
-              className="w-full border-gray-200 rounded-xl p-3 bg-gray-50 text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              className="w-full bg-card-alt border border-border rounded-md px-4 py-3 text-text-primary placeholder-text-subtle outline-none focus:border-primary"
               required
             />
           </div>
 
-          <div>
+          <div className="bg-card rounded-xl p-4 border border-border">
             <div className="flex justify-between items-center mb-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Amount (USDT)
-              </label>
-              <span className="text-xs text-gray-500 font-medium">
-                Available: ${maxAmount.toFixed(2)}
-              </span>
+              <label className="block text-text-secondary text-sm font-medium">Amount (USDT)</label>
+              <span className="text-text-subtle text-xs">Available: ${maxAmount.toFixed(2)}</span>
             </div>
             <div className="relative">
               <input
@@ -160,36 +164,34 @@ export default function Withdraw() {
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0.00"
-                className="w-full border-gray-200 rounded-xl p-3 pr-20 bg-gray-50 text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-lg font-medium"
+                className="w-full bg-card-alt border border-border rounded-md px-4 py-3 pr-20 text-text-primary text-lg font-bold placeholder-text-subtle outline-none focus:border-primary"
                 required
               />
               <button
                 type="button"
                 onClick={() => setAmount(maxAmount.toString())}
-                className="absolute right-2 top-2 text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors"
+                className="absolute right-2 top-2 text-xs font-semibold text-primary bg-primary-dim border border-primary-border px-3 py-1.5 rounded-md hover:bg-primary/20 transition-colors"
               >
                 MAX
               </button>
             </div>
           </div>
 
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 space-y-2">
+          <div className="bg-card rounded-xl p-4 border border-border space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Network Fee</span>
-              <span className="font-medium text-gray-700">
-                ${fee.toFixed(2)} USDT
-              </span>
+              <span className="text-text-secondary">Network Fee</span>
+              <span className="text-text-primary font-medium">{fee.toFixed(2)} USDT</span>
             </div>
-            <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
-              <span className="text-gray-700 font-medium">You will receive</span>
-              <span className="font-bold text-gray-900">
-                ${receiveAmount.toFixed(2)} USDT
-              </span>
+            <div className="flex justify-between text-sm pt-2 border-t border-border">
+              <span className="text-text-primary font-semibold">You will receive</span>
+              <span className="text-primary font-bold">{receiveAmount.toFixed(2)} USDT</span>
             </div>
           </div>
 
-          <button
-            type="submit"
+          <GradientButton
+            title={isSubmitting ? "Processing..." : "Confirm Withdrawal"}
+            onPress={() => {}}
+            loading={isSubmitting}
             disabled={
               isSubmitting ||
               !amount ||
@@ -197,17 +199,7 @@ export default function Withdraw() {
               parseFloat(amount) <= 0 ||
               parseFloat(amount) > maxAmount
             }
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl p-4 font-semibold shadow-md shadow-blue-200 transition-all disabled:opacity-50 disabled:shadow-none flex justify-center items-center gap-2 mt-4"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 size={20} className="animate-spin" />
-                Processing...
-              </>
-            ) : (
-              "Confirm Withdrawal"
-            )}
-          </button>
+          />
         </form>
       </div>
     </div>
