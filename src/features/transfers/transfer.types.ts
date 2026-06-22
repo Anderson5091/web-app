@@ -16,6 +16,7 @@ export type TransferStatus =
   | "QUOTE_GENERATED"
   | "FUNDS_RESERVED"
   | "COMPLIANCE_CHECK"
+  | "PENDING_PAYOUT"
   | "SENT_TO_PARTNER"
   | "DELIVERED"
   | "COMPLETED"
@@ -31,5 +32,7 @@ export interface Transfer {
   fee?: number;
   fxRate?: number;
   destinationAmount?: number;
+  payoutOrderId?: string;
+  payoutStatus?: string;
   createdAt: string;
 }

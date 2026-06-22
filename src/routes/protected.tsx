@@ -11,6 +11,7 @@ import Beneficiaries from "../pages/beneficiaries/Beneficiaries";
 import SendMoney from "../pages/transfers/SendMoney";
 import P2PTransfer from "../pages/transfers/P2PTransfer";
 import TransferTracker from "../pages/transfers/TransferTracker";
+import PayoutTracker from "../pages/payout/PayoutTracker";
 import WithdrawalTracker from "../pages/withdrawal/WithdrawalTracker";
 
 import ComplianceCenter from "../pages/compliance/ComplianceCenter";
@@ -108,6 +109,14 @@ export const protectedRoutes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <DepositTracker />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/payout/:id",
+    element: (
+      <ProtectedRoute>
+        <PayoutTracker />
       </ProtectedRoute>
     ),
   },

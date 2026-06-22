@@ -118,7 +118,7 @@ export default function Transactions() {
                       ? "bg-warning-dim text-warning"
                       : "bg-danger-dim text-danger"
                   }`}>
-                    {tx.status}
+                    {tx.status === "PENDING" && tx.type === "TRANSFER" ? "Pending (waiting for payout)" : tx.status}
                   </span>
                 </div>
               </div>
