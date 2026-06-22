@@ -41,7 +41,7 @@ export default function WalletHome() {
             <div>
               <p className="text-white/60 text-xs">Available</p>
               <p className="text-white text-base font-semibold mt-0.5">
-                ${(parseFloat(wallet?.availableBalance || "0") - parseFloat(wallet?.pendingBalance || "0")).toFixed(2)}
+                ${parseFloat(wallet?.availableBalance || "0").toFixed(2)}
               </p>
             </div>
             <div className="w-px h-8 bg-white/20" />
