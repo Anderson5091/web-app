@@ -182,7 +182,7 @@ export default function Home() {
                       ? "bg-warning-dim text-warning"
                       : "bg-danger-dim text-danger"
                   }`}>
-                    {tx.status === "PENDING" && tx.type === "TRANSFER" ? "Pending (waiting for payout)" : tx.status}
+                    {tx.status}
                   </span>
                 </div>
               </div>

@@ -12,10 +12,8 @@ export const transferApi = {
       const transfer: Transfer = {
         ...data,
         id: `tx_${Date.now()}`,
-        status: "PENDING_PAYOUT",
+        status: "COMPLETED",
         referenceId: `QS-${Date.now()}`,
-        payoutOrderId: `po_${Date.now()}`,
-        payoutStatus: "PENDING",
         createdAt: new Date().toISOString(),
       };
 
