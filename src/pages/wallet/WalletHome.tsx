@@ -93,17 +93,15 @@ export default function WalletHome() {
               <div
                 key={tx.id}
                 onClick={() => {
-                  if (isDeposit && tx.txHash) {
-                    navigate(`/deposit/${tx.txHash}`);
-                  } else if (tx.type === "WITHDRAWAL" && tx.txHash) {
-                    navigate(`/withdrawal/${tx.txHash}`);
-                  } else if (tx.type === "TRANSFER" && tx.payoutOrderId) {
-                    navigate(`/payout/${tx.payoutOrderId}`);
+                  if (isDeposit) {
+                    navigate(`/deposit/${tx.txHash || tx.id}`);
+                  } else if (tx.type === "WITHDRAWAL") {
+                    navigate(`/withdrawal/${tx.txHash || tx.id}`);
+                  } else if (tx.type === "TRANSFER") {
+                    navigate(`/payout/${tx.payoutOrderId || tx.id}`);
                   }
                 }}
-                className={`bg-card rounded-lg border border-border p-4 mb-2 transition-colors ${
-                  tx.txHash || (tx.type === "TRANSFER" && tx.payoutOrderId) ? "cursor-pointer hover:bg-card-alt" : ""
-                }`}
+                className="bg-card rounded-lg border border-border p-4 mb-2 transition-colors cursor-pointer hover:bg-card-alt"
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 ${
