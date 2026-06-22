@@ -15,7 +15,7 @@ interface WalletState {
   clearWallet: () => void;
 }
 
-export const useWalletStore = create<WalletState>((set, get) => ({
+export const useWalletStore = create<WalletState>((set) => ({
   wallet: null,
   addresses: [],
   transactions: [],
@@ -23,8 +23,6 @@ export const useWalletStore = create<WalletState>((set, get) => ({
   error: null,
 
   fetchWallet: async () => {
-    // Avoid refetching unnecessarily if we already have it
-    if (get().wallet) return; 
     set({ isLoading: true, error: null });
     try {
       const wallet = await WalletService.getWallet();
@@ -35,7 +33,6 @@ export const useWalletStore = create<WalletState>((set, get) => ({
   },
 
   fetchAddresses: async () => {
-    if (get().addresses.length > 0) return;
     set({ isLoading: true, error: null });
     try {
       const addresses = await WalletService.getAddresses();
