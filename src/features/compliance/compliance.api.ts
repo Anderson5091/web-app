@@ -75,19 +75,19 @@ export const complianceApi = {
     return api.get("/kyc/status");
   },
 
-  uploadDocument: async (documentType: string): Promise<{ data: KycDocument }> => {
+  uploadDocument: async (documentType: string, fileUrl?: string): Promise<{ data: KycDocument }> => {
     if (USE_COMPLIANCE_MOCK) {
       await delay(2000);
       const doc: KycDocument = {
         id: `doc_${Date.now()}`,
         documentType: documentType as any,
-        fileUrl: "/uploads/new_document.jpg",
+        fileUrl: fileUrl || "/uploads/new_document.jpg",
         status: "PENDING",
         createdAt: new Date().toISOString(),
       };
       return { data: doc };
     }
-    return api.post("/kyc/upload", { documentType });
+    return api.post("/kyc/upload", { documentType, fileUrl });
   },
 
   requestTierUpgrade: async (): Promise<{ data: { success: boolean; message: string } }> => {

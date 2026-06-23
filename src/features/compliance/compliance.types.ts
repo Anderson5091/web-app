@@ -15,12 +15,13 @@ export interface KycProfile {
   country: string;
   dateOfBirth: string;
   address: string;
+  selfieUrl?: string;
   createdAt: string;
 }
 
 export interface KycDocument {
   id: string;
-  documentType: "PASSPORT" | "NATIONAL_ID" | "DRIVER_LICENSE";
+  documentType: "PASSPORT" | "NATIONAL_ID" | "DRIVER_LICENSE" | "SELFIE";
   fileUrl: string;
   status: KycStatus;
   createdAt: string;

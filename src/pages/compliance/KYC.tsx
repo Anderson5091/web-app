@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../features/auth/auth.store";
 import {
   Shield, CheckCircle2, XCircle, User, BadgeCheck, Home,
-  CloudUpload, ArrowLeft, Loader2, ExternalLink
+  CloudUpload, ArrowLeft, Loader2, ExternalLink, Camera, Trash2
 } from "lucide-react";
 
 const TIERS = [
@@ -30,6 +30,8 @@ export default function KYC() {
 
   const [docType, setDocType] = useState("passport");
   const [docNumber, setDocNumber] = useState("");
+  const [selfie, setSelfie] = useState<string | null>(null);
+  const selfieInputRef = useRef<HTMLInputElement>(null);
 
   const [address, setAddress] = useState("");
   const [sourceOfFunds, setSourceOfFunds] = useState("");
@@ -41,6 +43,14 @@ export default function KYC() {
   const handleSubmit = async () => {
     if (!user) return;
     setSubmitting(true);
+
+    if (activeTab === 2 && selfie) {
+      try {
+        const { complianceApi } = await import("../../features/compliance/compliance.api");
+        await complianceApi.uploadDocument("SELFIE", selfie);
+      } catch { /* silent */ }
+    }
+
     await new Promise(r => setTimeout(r, 1500));
     const newTier = activeTab as 0 | 1 | 2 | 3;
     updateUser({ ...user, kycTier: newTier, kycStatus: "approved" });
@@ -215,6 +225,43 @@ export default function KYC() {
               <p className="text-text-secondary text-sm">Document upload (simulated)</p>
               <p className="text-text-subtle text-xs">PNG, JPG, PDF • Max 10MB</p>
             </div>
+
+            <h4 className="text-text-primary text-sm font-semibold mb-3">Selfie Verification</h4>
+            <input
+              ref={selfieInputRef}
+              type="file"
+              accept="image/*"
+              capture="user"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = () => setSelfie(reader.result as string);
+                  reader.readAsDataURL(file);
+                }
+              }}
+            />
+            {selfie ? (
+              <div className="relative rounded-lg overflow-hidden border border-border mb-4">
+                <img src={selfie} alt="Selfie" className="w-full h-48 object-cover" />
+                <button
+                  onClick={() => { setSelfie(null); if (selfieInputRef.current) selfieInputRef.current.value = ""; }}
+                  className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
+                >
+                  <Trash2 size={16} className="text-white" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => selfieInputRef.current?.click()}
+                className="w-full rounded-lg border-2 border-dashed border-border p-8 flex flex-col items-center gap-1 bg-card mb-4 hover:border-primary/50 transition-colors"
+              >
+                <Camera size={32} className="text-text-subtle" />
+                <p className="text-text-secondary text-sm">Take a selfie</p>
+                <p className="text-text-subtle text-xs">Use your camera to capture your face</p>
+              </button>
+            )}
           </div>
         )}
 

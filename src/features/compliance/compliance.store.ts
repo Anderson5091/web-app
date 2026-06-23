@@ -13,7 +13,7 @@ interface ComplianceState {
   error: string | null;
 
   fetchOverview: () => Promise<void>;
-  uploadDocument: (documentType: string) => Promise<void>;
+  uploadDocument: (documentType: string, fileUrl?: string) => Promise<void>;
   requestTierUpgrade: () => Promise<void>;
   clearMessages: () => void;
 }
@@ -57,10 +57,10 @@ export const useComplianceStore = create<ComplianceState>((set) => ({
     }
   },
 
-  uploadDocument: async (documentType) => {
+  uploadDocument: async (documentType, fileUrl) => {
     set({ isUploading: true, error: null, uploadMessage: null });
     try {
-      const res = await complianceApi.uploadDocument(documentType);
+      const res = await complianceApi.uploadDocument(documentType, fileUrl);
       set((state) => ({
         documents: [...state.documents, res.data],
         isUploading: false,
