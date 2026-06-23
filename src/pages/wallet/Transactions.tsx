@@ -4,13 +4,14 @@ import { useWalletStore } from "../../features/wallet/wallet.store";
 import { ArrowDownLeft, ArrowUpRight, Send } from "lucide-react";
 import Loader from "../../components/ui/Loader";
 
-type FilterTab = "all" | "pending" | "completed" | "failed";
+type FilterTab = "all" | "pending" | "completed" | "failed" | "cancelled";
 
 const FILTERS: { key: FilterTab; label: string }[] = [
   { key: "all", label: "All" },
   { key: "pending", label: "Pending" },
   { key: "completed", label: "Completed" },
   { key: "failed", label: "Failed" },
+  { key: "cancelled", label: "Cancelled" },
 ];
 
 export default function Transactions() {
@@ -27,6 +28,7 @@ export default function Transactions() {
     if (filter === "pending") return tx.status === "PENDING" || tx.status === "DETECTED";
     if (filter === "completed") return tx.status === "COMPLETED";
     if (filter === "failed") return tx.status === "FAILED";
+    if (filter === "cancelled") return tx.status === "CANCELLED";
     return true;
   });
 
@@ -112,13 +114,19 @@ export default function Transactions() {
                   <span className={`inline-block px-2 py-0.5 text-[10px] font-semibold rounded-full mt-1 ${
                     tx.status === "COMPLETED"
                       ? "bg-primary-dim text-primary"
+                      : tx.status === "CANCELLED"
+                      ? "bg-card-alt text-text-subtle border border-border"
                       : tx.status === "PENDING" && tx.type === "TRANSFER"
                       ? "bg-warning-dim text-warning"
                       : tx.status === "PENDING"
                       ? "bg-warning-dim text-warning"
                       : "bg-danger-dim text-danger"
                   }`}>
-                    {tx.status === "PENDING" && tx.type === "TRANSFER" ? "Pending (waiting for payout)" : tx.status}
+                    {tx.status === "PENDING" && tx.type === "TRANSFER"
+                      ? "Pending (waiting for payout)"
+                      : tx.status === "CANCELLED"
+                      ? "Cancelled"
+                      : tx.status}
                   </span>
                 </div>
               </div>
