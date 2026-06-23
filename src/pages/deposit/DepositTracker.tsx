@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { WalletService } from "../../features/wallet/wallet.service";
 import type { DepositStatus } from "../../features/wallet/wallet.types";
-import { ArrowLeft, Clock, Loader, Check, Copy, ExternalLink, XCircle } from "lucide-react";
+import { ArrowLeft, Loader, Check, Copy, ExternalLink, XCircle } from "lucide-react";
 
 const REQUIRED_CONFIRMATIONS = 5;
 

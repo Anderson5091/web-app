@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useWalletStore } from "../../features/wallet/wallet.store";
-import { ArrowDownLeft, ArrowUpRight, Send, ArrowRightArrowLeft } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Send, ArrowRightLeft } from "lucide-react";
 import Loader from "../../components/ui/Loader";
 
 type FilterTab = "all" | "pending" | "completed" | "failed" | "cancelled";
@@ -97,7 +97,7 @@ export default function Transactions() {
                   ) : tx.type === "WITHDRAWAL" ? (
                     <ArrowUpRight size={20} className="text-danger" />
                   ) : tx.transferType === "internal" ? (
-                    <ArrowRightArrowLeft size={20} className="text-primary" />
+                    <ArrowRightLeft size={20} className="text-primary" />
                   ) : (
                     <Send size={20} className="text-warning" />
                   )}

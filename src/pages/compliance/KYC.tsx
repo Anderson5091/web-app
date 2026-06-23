@@ -26,7 +26,7 @@ export default function KYC() {
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  const [fullName, setFullName] = useState(user?.name || "");
+  const [fullName, setFullName] = useState(user?.fullName || "");
   const [dob, setDob] = useState("");
   const [nationality, setNationality] = useState("");
 

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { WalletService } from "../../features/wallet/wallet.service";
 import type { WithdrawalDetail } from "../../features/wallet/wallet.types";
-import { ArrowLeft, Clock, Loader, Check, Copy, ExternalLink, XCircle, ArrowUpRight } from "lucide-react";
+import { ArrowLeft, Loader, Check, Copy, ExternalLink, XCircle, ArrowUpRight } from "lucide-react";
 
 const WITHDRAWAL_STEPS = ["PENDING", "SENT", "COMPLETED"];
 
@@ -61,7 +61,7 @@ export default function WithdrawalTracker() {
     );
   }
 
-  const isComplete = withdrawal.status === "SENT" || withdrawal.status === "COMPLETED";
+  const isComplete = withdrawal.status === "SENT" || (withdrawal.status as string) === "COMPLETED";
   const isFailed = withdrawal.status === "FAILED";
   const stepIndex = WITHDRAWAL_STEPS.indexOf(
     isComplete ? "COMPLETED" : withdrawal.status

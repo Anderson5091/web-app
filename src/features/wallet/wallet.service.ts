@@ -23,7 +23,7 @@ const mockTransactions: Transaction[] = [
   {
     id: "tx_1",
     type: "DEPOSIT",
-    amount: "500.00",
+    amount: 500,
     network: "BASE",
     txHash: "0xabc...def",
     status: "COMPLETED",
@@ -32,7 +32,7 @@ const mockTransactions: Transaction[] = [
   {
     id: "tx_2",
     type: "WITHDRAWAL",
-    amount: "150.00",
+    amount: 150,
     network: "ETHEREUM",
     txHash: "0x123...456",
     status: "COMPLETED",
@@ -41,7 +41,7 @@ const mockTransactions: Transaction[] = [
   {
     id: "tx_3",
     type: "TRANSFER",
-    amount: "50.00",
+    amount: 50,
     network: "INTERNAL",
     status: "PENDING",
     createdAt: new Date().toISOString(),
@@ -51,7 +51,7 @@ const mockTransactions: Transaction[] = [
   {
     id: "tx_4",
     type: "TRANSFER",
-    amount: "200.00",
+    amount: 200,
     network: "BANK",
     status: "COMPLETED",
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
@@ -62,7 +62,7 @@ const mockTransactions: Transaction[] = [
   {
     id: "tx_5",
     type: "TRANSFER",
-    amount: "300.00",
+    amount: 300,
     network: "BANK_ACCOUNT",
     status: "COMPLETED",
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
@@ -73,7 +73,7 @@ const mockTransactions: Transaction[] = [
   {
     id: "tx_6",
     type: "TRANSFER",
-    amount: "120.00",
+    amount: 120,
     network: "CASH",
     status: "COMPLETED",
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(),

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useComplianceStore } from "../../features/compliance/compliance.store";
 import {
@@ -7,7 +7,6 @@ import {
   XCircle,
   Clock,
   AlertTriangle,
-  Upload,
   Loader2,
   Gauge,
   FileText,
@@ -27,11 +26,7 @@ const tierDescriptions = [
   "High limits ($100K/day)",
 ];
 
-const docTypeLabels: Record<string, string> = {
-  PASSPORT: "Passport",
-  NATIONAL_ID: "National ID",
-  DRIVER_LICENSE: "Driver's License",
-};
+
 
 type StatusKey = "APPROVED" | "PENDING" | "REJECTED";
 
@@ -116,19 +111,16 @@ export default function ComplianceCenter() {
   const kycFrom = state?.kycFrom || "/compliance";
   const {
     overview,
-    documents,
     isLoading,
-    isUploading,
     isUpgrading,
     uploadMessage,
     upgradeMessage,
     fetchOverview,
-    uploadDocument,
     requestTierUpgrade,
     clearMessages,
   } = useComplianceStore();
 
-  const [docType, setDocType] = useState("PASSPORT");
+
 
   useEffect(() => {
     fetchOverview();

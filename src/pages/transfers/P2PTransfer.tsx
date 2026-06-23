@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useWalletStore } from "../../features/wallet/wallet.store";
 import { WalletService } from "../../features/wallet/wallet.service";
-import { ArrowLeft, ArrowLeftRight, CheckCircle2, Loader, XCircle } from "lucide-react";
+import { ArrowLeft, ArrowLeftRight, CheckCircle2, XCircle } from "lucide-react";
 import GradientButton from "../../components/ui/GradientButton";
 
 export default function P2PTransfer() {
