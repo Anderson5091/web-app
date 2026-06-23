@@ -70,9 +70,9 @@ export default function Home() {
           <p className="text-text-secondary text-base mt-0.5 mb-2">USDT</p>
 
           <div className="flex gap-2 flex-wrap mt-2">
-            {(wallet?.cryptoWallets?.length ? wallet.cryptoWallets : [{ network: "BASE" }, { network: "ETHEREUM" }, { network: "SOLANA" }, { network: "POLYGON" }]).map((w) => (
-              <span key={w.network} className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-text-secondary text-[10px]">
-                {w.network}
+            {["BASE", "ETHEREUM", "POLYGON", "SOLANA"].map((n) => (
+              <span key={n} className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-text-secondary text-[10px]">
+                {n}
               </span>
             ))}
           </div>
