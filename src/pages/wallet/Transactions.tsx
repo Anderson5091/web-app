@@ -100,12 +100,18 @@ export default function Transactions() {
                     <Send size={20} className="text-warning" />
                   )}
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <p className="text-text-primary text-sm font-semibold capitalize">
                     {tx.type === "TRANSFER" ? "Transfer" : tx.type.toLowerCase()}
                     {tx.transactionNumber ? <span className="text-text-subtle text-xs ml-2 font-mono">#{tx.transactionNumber}</span> : null}
                   </p>
-                  <p className="text-text-subtle text-xs mt-0.5">{new Date(tx.createdAt).toLocaleDateString()}</p>
+                  <p className="text-text-subtle text-xs mt-0.5 truncate">
+                    {tx.type === "TRANSFER" && tx.transferType === "internal" && tx.recipientEmail
+                      ? `To ${tx.recipientEmail}`
+                      : tx.type === "TRANSFER" && tx.transferType === "global" && tx.recipientName
+                      ? `To ${tx.recipientName}${tx.recipientPhone ? ` <${tx.recipientPhone}>` : ""}${tx.recipientBankAccount ? ` <${tx.recipientBankAccount}>` : ""}${tx.recipientCashPickup ? " <Cash Pickup>" : ""}`
+                      : new Date(tx.createdAt).toLocaleDateString()}
+                  </p>
                 </div>
                 <div className="text-right">
                   <p className={`text-sm font-bold ${isDeposit ? "text-primary" : "text-danger"}`}>

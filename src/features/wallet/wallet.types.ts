@@ -60,10 +60,16 @@ export interface Transaction {
   amount: number;
   network: string;
   txHash?: string;
-  status: "PENDING" | "DETECTED" | "COMPLETED" | "FAILED";
+  status: "PENDING" | "DETECTED" | "COMPLETED" | "FAILED" | "CANCELLED";
   transactionNumber?: string;
   payoutOrderId?: string;
   createdAt: string;
+  transferType?: "internal" | "global";
+  recipientName?: string;
+  recipientPhone?: string;
+  recipientEmail?: string;
+  recipientBankAccount?: string;
+  recipientCashPickup?: string;
 }
 
 export interface WithdrawalResponse {
