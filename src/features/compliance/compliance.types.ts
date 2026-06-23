@@ -21,7 +21,7 @@ export interface KycProfile {
 
 export interface KycDocument {
   id: string;
-  documentType: "PASSPORT" | "NATIONAL_ID" | "DRIVER_LICENSE" | "SELFIE";
+  documentType: "PASSPORT" | "PASSPORT_FRONT" | "NATIONAL_ID" | "NATIONAL_ID_FRONT" | "NATIONAL_ID_BACK" | "DRIVER_LICENSE" | "DRIVER_LICENSE_FRONT" | "DRIVER_LICENSE_BACK" | "SELFIE";
   fileUrl: string;
   status: KycStatus;
   createdAt: string;

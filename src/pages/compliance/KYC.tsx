@@ -31,7 +31,11 @@ export default function KYC() {
   const [docType, setDocType] = useState("passport");
   const [docNumber, setDocNumber] = useState("");
   const [selfie, setSelfie] = useState<string | null>(null);
+  const [docFront, setDocFront] = useState<string | null>(null);
+  const [docBack, setDocBack] = useState<string | null>(null);
   const selfieInputRef = useRef<HTMLInputElement>(null);
+  const docFrontRef = useRef<HTMLInputElement>(null);
+  const docBackRef = useRef<HTMLInputElement>(null);
 
   const [address, setAddress] = useState("");
   const [sourceOfFunds, setSourceOfFunds] = useState("");
@@ -44,10 +48,13 @@ export default function KYC() {
     if (!user) return;
     setSubmitting(true);
 
-    if (activeTab === 2 && selfie) {
+    if (activeTab === 2) {
       try {
         const { complianceApi } = await import("../../features/compliance/compliance.api");
-        await complianceApi.uploadDocument("SELFIE", selfie);
+        const docTypeUpper = docType === "drivers_license" ? "DRIVER_LICENSE" : docType === "passport" ? "PASSPORT" : "NATIONAL_ID";
+        if (docFront) await complianceApi.uploadDocument(docTypeUpper + "_FRONT", docFront);
+        if (docBack) await complianceApi.uploadDocument(docTypeUpper + "_BACK", docBack);
+        if (selfie) await complianceApi.uploadDocument("SELFIE", selfie);
       } catch { /* silent */ }
     }
 
@@ -200,7 +207,7 @@ export default function KYC() {
               ].map(d => (
                 <button
                   key={d.key}
-                  onClick={() => setDocType(d.key)}
+                  onClick={() => { setDocType(d.key); setDocFront(null); setDocBack(null); }}
                   className={`flex-1 py-2.5 rounded-md border text-[10px] font-medium transition-colors ${
                     docType === d.key
                       ? "border-primary bg-primary-dim text-primary"
@@ -220,11 +227,85 @@ export default function KYC() {
                 className="w-full bg-card border border-border rounded-md px-4 h-[52px] text-text-primary placeholder-text-subtle text-base outline-none focus:border-primary transition-colors"
               />
             </div>
-            <div className="rounded-lg border-2 border-dashed border-border p-8 flex flex-col items-center gap-1 bg-card mb-4">
-              <CloudUpload size={32} className="text-text-subtle" />
-              <p className="text-text-secondary text-sm">Document upload (simulated)</p>
-              <p className="text-text-subtle text-xs">PNG, JPG, PDF • Max 10MB</p>
-            </div>
+            {/* Document Front / Single */}
+            <p className="text-text-primary text-xs font-semibold mb-2">
+              {docType === "passport" ? "Upload Passport" : "Upload Front Side"}
+            </p>
+            <input
+              ref={docFrontRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = () => setDocFront(reader.result as string);
+                  reader.readAsDataURL(file);
+                }
+              }}
+            />
+            {docFront ? (
+              <div className="relative rounded-lg overflow-hidden border border-border mb-3">
+                <img src={docFront} alt="Document front" className="w-full h-36 object-cover" />
+                <button
+                  onClick={() => { setDocFront(null); if (docFrontRef.current) docFrontRef.current.value = ""; }}
+                  className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
+                >
+                  <Trash2 size={14} className="text-white" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => docFrontRef.current?.click()}
+                className="w-full rounded-lg border-2 border-dashed border-border p-6 flex flex-col items-center gap-1 bg-card mb-3 hover:border-primary/50 transition-colors"
+              >
+                <CloudUpload size={28} className="text-text-subtle" />
+                <p className="text-text-secondary text-xs">Tap to upload</p>
+                <p className="text-text-subtle text-[10px]">PNG, JPG • Max 10MB</p>
+              </button>
+            )}
+
+            {/* Document Back — only for non-passport */}
+            {docType !== "passport" && (
+              <>
+                <p className="text-text-primary text-xs font-semibold mb-2">Upload Back Side</p>
+                <input
+                  ref={docBackRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = () => setDocBack(reader.result as string);
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+                {docBack ? (
+                  <div className="relative rounded-lg overflow-hidden border border-border mb-4">
+                    <img src={docBack} alt="Document back" className="w-full h-36 object-cover" />
+                    <button
+                      onClick={() => { setDocBack(null); if (docBackRef.current) docBackRef.current.value = ""; }}
+                      className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
+                    >
+                      <Trash2 size={14} className="text-white" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => docBackRef.current?.click()}
+                    className="w-full rounded-lg border-2 border-dashed border-border p-6 flex flex-col items-center gap-1 bg-card mb-4 hover:border-primary/50 transition-colors"
+                  >
+                    <CloudUpload size={28} className="text-text-subtle" />
+                    <p className="text-text-secondary text-xs">Tap to upload</p>
+                    <p className="text-text-subtle text-[10px]">PNG, JPG • Max 10MB</p>
+                  </button>
+                )}
+              </>
+            )}
 
             <h4 className="text-text-primary text-sm font-semibold mb-3">Selfie Verification</h4>
             <input
