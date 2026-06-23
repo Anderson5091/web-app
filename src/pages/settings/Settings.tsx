@@ -66,10 +66,10 @@ export default function Settings() {
         {/* Profile Card */}
         <div className="bg-gradient-to-br from-[#1A2640] to-[#151B2B] rounded-xl p-5 border border-border flex items-center gap-4 mb-6">
           <div className="w-[52px] h-[52px] rounded-full bg-primary-dim border-2 border-primary-border flex items-center justify-center">
-            <span className="text-primary text-xl font-bold">{user?.name?.[0] || "U"}</span>
+            <span className="text-primary text-xl font-bold">{(user?.fullName?.[0] || user?.email?.[0] || "U").toUpperCase()}</span>
           </div>
           <div className="flex-1">
-            <p className="text-text-primary text-base font-bold">{user?.name || "User"}</p>
+            <p className="text-text-primary text-base font-bold">{user?.fullName || "User"}</p>
             <p className="text-text-secondary text-xs mt-0.5">{user?.email}</p>
           </div>
           <div

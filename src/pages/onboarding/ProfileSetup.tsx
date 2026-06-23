@@ -45,7 +45,7 @@ export default function ProfileSetup() {
         <div className="bg-card rounded-xl border border-border overflow-hidden mb-5">
           <div className="flex flex-col items-center py-8 px-5">
             <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-r from-[#00D6A3] to-[#0084FF] flex items-center justify-center text-white font-bold text-3xl overflow-hidden shadow-lg shadow-[#00D6A3]/20">
+              <div className="w-24 h-24 rounded-full bg-primary-dim border border-primary-border flex items-center justify-center text-primary font-bold text-3xl overflow-hidden">
                 {avatar ? (
                   <img src={avatar} alt="" className="w-full h-full object-cover" />
                 ) : (
