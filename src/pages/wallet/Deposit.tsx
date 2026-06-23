@@ -6,10 +6,10 @@ import { WalletService } from "../../features/wallet/wallet.service";
 import type { DepositStatus } from "../../features/wallet/wallet.types";
 
 const NETWORKS = [
-  { key: "BASE", name: "Base", symbol: "USDC", icon: "B" },
-  { key: "ETHEREUM", name: "Ethereum", symbol: "ERC-20", icon: "E" },
-  { key: "POLYGON", name: "Polygon", symbol: "MATIC", icon: "P" },
-  { key: "SOLANA", name: "Solana", symbol: "SPL", icon: "S" },
+  { key: "BASE", name: "Base", symbol: "ERC-4337/7579", icon: "B" },
+  { key: "ETHEREUM", name: "Ethereum", symbol: "ERC-4337/7579", icon: "E" },
+  { key: "POLYGON", name: "Polygon", symbol: "ERC-4337/7579", icon: "P" },
+  { key: "SOLANA", name: "Solana", symbol: "Native-PDA", icon: "S" },
 ];
 
 const FEE_RATE = 0.01;
