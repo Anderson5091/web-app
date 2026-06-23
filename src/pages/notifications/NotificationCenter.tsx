@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useNotificationStore } from "../../features/notifications/notification.store";
 import { useNavigate } from "react-router-dom";
+import { NOTIFICATION_TYPE_MAP } from "../../features/notifications/notification.types";
 import { Bell, ArrowLeft, CheckCheck, Send, Shield, AlertTriangle, Wallet, Ban, Clock } from "lucide-react";
 
 const typeIcons: Record<string, React.ElementType> = {
@@ -24,12 +25,25 @@ const typeStyles: Record<string, { bg: string; text: string; border: string }> =
 };
 
 export default function NotificationCenter() {
-  const { notifications, isLoading, fetchNotifications, markAsRead, markAllAsRead } = useNotificationStore();
+  const { notifications, isLoading, preferences, fetchNotifications, markAsRead, markAllAsRead } = useNotificationStore();
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchNotifications();
   }, [fetchNotifications]);
+
+  const enabledTypes = useMemo(() => {
+    const types = new Set<string>();
+    (Object.keys(NOTIFICATION_TYPE_MAP) as (keyof typeof NOTIFICATION_TYPE_MAP)[]).forEach((key) => {
+      if (preferences[key]) NOTIFICATION_TYPE_MAP[key].forEach((t) => types.add(t));
+    });
+    return types;
+  }, [preferences]);
+
+  const filtered = useMemo(
+    () => notifications.filter((n) => !n.type || enabledTypes.has(n.type)),
+    [notifications, enabledTypes]
+  );
 
   return (
     <div className="min-h-screen bg-app-bg">
@@ -45,7 +59,7 @@ export default function NotificationCenter() {
               <p className="text-text-secondary text-xs">Stay updated on your activity</p>
             </div>
           </div>
-          {notifications.length > 0 && (
+          {filtered.length > 0 && (
             <button
               onClick={markAllAsRead}
               className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition-colors px-3 py-1.5 rounded-lg hover:bg-primary-dim"
@@ -61,7 +75,7 @@ export default function NotificationCenter() {
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
           </div>
-        ) : notifications.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64 text-center">
             <div className="w-16 h-16 bg-card rounded-full flex items-center justify-center mb-4 border border-border">
               <Bell size={28} className="text-text-subtle" />
@@ -73,7 +87,7 @@ export default function NotificationCenter() {
           </div>
         ) : (
           <div className="space-y-2">
-            {notifications.map((notification) => {
+            {filtered.map((notification) => {
               const Icon = typeIcons[notification.type || ""] || Bell;
               const style = typeStyles[notification.type || ""] || { bg: "bg-card-alt", text: "text-text-secondary", border: "border-border" };
               const isUnread = notification.status === "SENT" || notification.status === "PENDING";

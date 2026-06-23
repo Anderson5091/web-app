@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../features/auth/auth.store";
+import { useNotificationStore } from "../../features/notifications/notification.store";
 import {
   User, Lock, Smartphone, Bell, Info, HelpCircle, FileText,
   ChevronRight, LogOut, Verified
@@ -47,7 +47,7 @@ function Row({ icon: Icon, label, subtitle, onPress, toggle, color, rightText }:
 export default function Settings() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-  const [notifDeposits, setNotifDeposits] = useState(true);
+  const { preferences, setPreference } = useNotificationStore();
 
   const handleLogout = () => {
     logout();
@@ -100,24 +100,36 @@ export default function Settings() {
         {/* Notifications */}
         <p className="text-text-subtle text-[10px] font-semibold tracking-wider uppercase mb-2 ml-1">Notifications</p>
         <div className="bg-card rounded-lg border border-border overflow-hidden mb-6">
-          <Row icon={Bell} label="Transfer Updates" subtitle="Status changes for your transfers" toggle color="#00D6A3" />
-          <div className="border-b border-border last:border-0">
-            <button
-              className="w-full flex items-center gap-4 p-4 hover:bg-card-alt transition-colors text-left"
-              onClick={() => setNotifDeposits(!notifDeposits)}
-            >
-              <div className="w-10 h-10 rounded-md flex items-center justify-center bg-secondary-dim">
-                <Bell size={20} className="text-secondary" />
-              </div>
-              <div className="flex-1">
-                <p className="text-text-primary text-sm">Deposits</p>
-                <p className="text-text-subtle text-xs mt-0.5">Incoming funds alerts</p>
-              </div>
-              <div className={`w-11 h-6 rounded-full p-0.5 transition-colors ${notifDeposits ? "bg-primary" : "bg-border"}`}>
-                <div className={`w-5 h-5 rounded-full bg-white transition-transform ${notifDeposits ? "translate-x-5" : "translate-x-0"}`} />
-              </div>
-            </button>
-          </div>
+          <button
+            className="w-full flex items-center gap-4 p-4 border-b border-border hover:bg-card-alt transition-colors text-left"
+            onClick={() => setPreference("transferUpdates", !preferences.transferUpdates)}
+          >
+            <div className="w-10 h-10 rounded-md flex items-center justify-center bg-primary-dim">
+              <Bell size={20} className="text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="text-text-primary text-sm">Transfer Updates</p>
+              <p className="text-text-subtle text-xs mt-0.5">Status changes for your transfers</p>
+            </div>
+            <div className={`w-11 h-6 rounded-full p-0.5 transition-colors ${preferences.transferUpdates ? "bg-primary" : "bg-border"}`}>
+              <div className={`w-5 h-5 rounded-full bg-white transition-transform ${preferences.transferUpdates ? "translate-x-5" : "translate-x-0"}`} />
+            </div>
+          </button>
+          <button
+            className="w-full flex items-center gap-4 p-4 hover:bg-card-alt transition-colors text-left"
+            onClick={() => setPreference("deposits", !preferences.deposits)}
+          >
+            <div className="w-10 h-10 rounded-md flex items-center justify-center bg-primary-dim">
+              <Bell size={20} className="text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="text-text-primary text-sm">Deposits</p>
+              <p className="text-text-subtle text-xs mt-0.5">Incoming funds alerts</p>
+            </div>
+            <div className={`w-11 h-6 rounded-full p-0.5 transition-colors ${preferences.deposits ? "bg-primary" : "bg-border"}`}>
+              <div className={`w-5 h-5 rounded-full bg-white transition-transform ${preferences.deposits ? "translate-x-5" : "translate-x-0"}`} />
+            </div>
+          </button>
         </div>
 
         {/* App */}
