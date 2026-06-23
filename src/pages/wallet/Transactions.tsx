@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useWalletStore } from "../../features/wallet/wallet.store";
-import { ArrowDownLeft, ArrowUpRight, Send } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Send, ArrowRightArrowLeft } from "lucide-react";
 import Loader from "../../components/ui/Loader";
 
 type FilterTab = "all" | "pending" | "completed" | "failed" | "cancelled";
@@ -90,12 +90,14 @@ export default function Transactions() {
                 className="flex items-center gap-4 bg-card rounded-lg border border-border p-4 mb-2 transition-colors cursor-pointer hover:bg-card-alt"
               >
                 <div className={`w-10 h-10 rounded-md flex items-center justify-center ${
-                  isDeposit ? "bg-primary-dim" : tx.type === "WITHDRAWAL" ? "bg-danger-dim" : "bg-warning-dim"
+                  isDeposit ? "bg-primary-dim" : tx.type === "WITHDRAWAL" ? "bg-danger-dim" : tx.transferType === "internal" ? "bg-primary-dim" : "bg-warning-dim"
                 }`}>
                   {isDeposit ? (
                     <ArrowDownLeft size={20} className="text-primary" />
                   ) : tx.type === "WITHDRAWAL" ? (
                     <ArrowUpRight size={20} className="text-danger" />
+                  ) : tx.transferType === "internal" ? (
+                    <ArrowRightArrowLeft size={20} className="text-primary" />
                   ) : (
                     <Send size={20} className="text-warning" />
                   )}
