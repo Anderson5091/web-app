@@ -86,7 +86,7 @@ export default function Settings() {
         {/* Verification */}
         <p className="text-text-subtle text-[10px] font-semibold tracking-wider uppercase mb-2 ml-1">Verification</p>
         <div className="bg-card rounded-lg border border-border overflow-hidden mb-6">
-          <Row icon={Verified} label="KYC Verification" subtitle={kycLabel} onPress={() => navigate("/compliance/kyc")} color="#A78BFA" rightText={user?.kycStatus === "approved" ? "Approved" : "Pending"} />
+          <Row icon={Verified} label="KYC Verification" subtitle={kycLabel} onPress={() => navigate("/compliance/kyc", { state: { from: "/settings" } })} color="#A78BFA" rightText={user?.kycStatus === "approved" ? "Approved" : "Pending"} />
         </div>
 
         {/* Account */}

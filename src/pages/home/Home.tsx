@@ -24,7 +24,7 @@ export default function Home() {
     { icon: ArrowDownLeft, label: "Add Funds",  onPress: () => navigate("/wallet/deposit"),      color: "#0084FF" },
     { icon: ArrowUpRight,  label: "Withdraw",   onPress: () => navigate("/wallet/withdraw"),     color: "#F5A623" },
     { icon: History,       label: "History",    onPress: () => navigate("/wallet/transactions"), color: "#A78BFA" },
-    { icon: Verified,      label: "KYC / ID",   onPress: () => navigate("/compliance/kyc"),      color: "#00D6A3" },
+    { icon: Verified,      label: "KYC / ID",   onPress: () => navigate("/compliance/kyc", { state: { from: "/" } }),      color: "#00D6A3" },
   ];
 
   return (

@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../features/auth/auth.store";
 import {
   Shield, CheckCircle2, XCircle, User, BadgeCheck, Home,
@@ -19,6 +19,8 @@ function TierIcon({ icon: Icon, color }: { icon: React.ComponentType<{ size?: nu
 
 export default function KYC() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string })?.from;
   const { user, updateUser } = useAuthStore();
   const [activeTab, setActiveTab] = useState<1 | 2 | 3>(1);
   const [submitting, setSubmitting] = useState(false);
@@ -79,16 +81,17 @@ export default function KYC() {
   return (
     <div className="min-h-screen bg-app-bg">
       <div className="max-w-2xl mx-auto p-4 pb-24">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-text-secondary hover:text-text-primary mb-4 transition-colors"
-        >
-          <ArrowLeft size={20} />
-          <span className="text-sm">Back</span>
-        </button>
-
-        <h1 className="text-text-primary text-2xl font-bold mb-1">KYC Verification</h1>
-        <p className="text-text-secondary text-sm mb-6">Identity Verification</p>
+        <div className="flex items-center gap-3 mb-6">
+          {from && (
+            <button onClick={() => navigate(from)} className="w-10 h-10 rounded-full bg-card flex items-center justify-center shrink-0 hover:border-primary/30 transition-colors">
+              <ArrowLeft size={20} className="text-text-primary" />
+            </button>
+          )}
+          <div>
+            <h1 className="text-text-primary text-2xl font-bold">KYC Verification</h1>
+            <p className="text-text-secondary text-sm">Identity Verification</p>
+          </div>
+        </div>
 
         {successMsg && (
           <div className="flex items-center gap-3 bg-primary-dim border border-primary-border rounded-lg p-4 mb-5">
@@ -124,7 +127,7 @@ export default function KYC() {
               </span>
             </div>
             <button
-              onClick={() => navigate("/compliance")}
+              onClick={() => navigate("/compliance", { state: { from: "/compliance/kyc", kycFrom: from || "/" } })}
               className="flex items-center gap-1.5 text-white/70 hover:text-white text-xs font-medium transition-colors"
             >
               <ExternalLink size={12} />
@@ -237,9 +240,9 @@ export default function KYC() {
               />
             </div>
             {/* Document Front / Single */}
-            <p className="text-text-primary text-xs font-semibold mb-2">
+            <label className="block text-text-secondary text-sm font-medium mb-1.5">
               {docType === "passport" ? "Upload Passport" : "Upload Front Side"}
-            </p>
+            </label>
             <input
               ref={docFrontRef}
               type="file"
@@ -278,7 +281,7 @@ export default function KYC() {
             {/* Document Back — only for non-passport */}
             {docType !== "passport" && (
               <>
-                <p className="text-text-primary text-xs font-semibold mb-2">Upload Back Side</p>
+                <label className="block text-text-secondary text-sm font-medium mb-1.5">Upload Back Side</label>
                 <input
                   ref={docBackRef}
                   type="file"
@@ -316,7 +319,7 @@ export default function KYC() {
               </>
             )}
 
-            <h4 className="text-text-primary text-sm font-semibold mb-3">Selfie Verification</h4>
+            <label className="block text-text-secondary text-sm font-medium mb-1.5">Selfie Verification</label>
             <input
               ref={selfieInputRef}
               type="file"
