@@ -69,13 +69,6 @@ export default function Home() {
           </h2>
           <p className="text-text-secondary text-base mt-0.5 mb-2">USDT</p>
 
-          {wallet && parseFloat(wallet.pendingBalance) > 0 && (
-            <div className="flex items-center gap-1 mb-2">
-              <History size={13} className="text-warning" />
-              <span className="text-warning text-xs">${parseFloat(wallet.pendingBalance).toFixed(2)} USDT pending</span>
-            </div>
-          )}
-
           <div className="flex gap-2 flex-wrap mt-2">
             {(wallet?.cryptoWallets?.length ? wallet.cryptoWallets : [{ network: "BASE" }, { network: "ETHEREUM" }, { network: "SOLANA" }, { network: "POLYGON" }]).map((w) => (
               <span key={w.network} className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-text-secondary text-[10px]">
