@@ -55,8 +55,15 @@ export default function Settings() {
     navigate("/login");
   };
 
-  const kycLabel = ["Not Started", "Tier 1 — Basic", "Tier 2 — ID Verified", "Tier 3 — Full"][user?.kycTier || 0];
-  const kycColor = user?.kycStatus === "approved" ? "#00D6A3" : "#F5A623";
+  const kycStatusMap: Record<string, { label: string; color: string }> = {
+    none: { label: "Not Started", color: "#707B90" },
+    pending: { label: "Pending Review", color: "#F5A623" },
+    approved: { label: `Tier ${user?.kycTier || 0} — ${["", "Basic", "ID Verified", "Full"][user?.kycTier || 0]}`, color: "#00D6A3" },
+    rejected: { label: "Rejected", color: "#FF4E4E" },
+  };
+  const kycInfo = kycStatusMap[user?.kycStatus || "none"];
+  const kycLabel = kycInfo.label;
+  const kycColor = kycInfo.color;
 
   return (
     <div className="min-h-screen bg-app-bg">
