@@ -493,8 +493,8 @@ export default function ComplianceCenter() {
             <div className="p-8 text-center space-y-3">
               <p className="text-text-subtle text-sm">No KYC profile found.</p>
               <button
-              onClick={() => navigate("/compliance/kyc", { state: { from: kycFrom } })}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#00D6A3] to-[#0084FF] text-white rounded-lg text-sm font-bold transition-opacity hover:opacity-90"
+                onClick={() => navigate("/compliance/kyc", { state: { from: kycFrom } })}
+                className="inline-flex items-center gap-2 bg-primary-dim border border-primary-border rounded-lg px-4 py-2 text-primary text-sm font-semibold hover:bg-primary/20 transition-colors"
               >
                 Start Verification
               </button>
