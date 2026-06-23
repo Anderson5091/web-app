@@ -33,9 +33,11 @@ export default function KYC() {
   const [selfie, setSelfie] = useState<string | null>(null);
   const [docFront, setDocFront] = useState<string | null>(null);
   const [docBack, setDocBack] = useState<string | null>(null);
+  const [proofAddress, setProofAddress] = useState<string | null>(null);
   const selfieInputRef = useRef<HTMLInputElement>(null);
   const docFrontRef = useRef<HTMLInputElement>(null);
   const docBackRef = useRef<HTMLInputElement>(null);
+  const proofAddressRef = useRef<HTMLInputElement>(null);
 
   const [address, setAddress] = useState("");
   const [sourceOfFunds, setSourceOfFunds] = useState("");
@@ -55,6 +57,13 @@ export default function KYC() {
         if (docFront) await complianceApi.uploadDocument(docTypeUpper + "_FRONT", docFront);
         if (docBack) await complianceApi.uploadDocument(docTypeUpper + "_BACK", docBack);
         if (selfie) await complianceApi.uploadDocument("SELFIE", selfie);
+      } catch { /* silent */ }
+    }
+
+    if (activeTab === 3 && proofAddress) {
+      try {
+        const { complianceApi } = await import("../../features/compliance/compliance.api");
+        await complianceApi.uploadDocument("PROOF_OF_ADDRESS", proofAddress);
       } catch { /* silent */ }
     }
 
@@ -369,9 +378,42 @@ export default function KYC() {
                   className="w-full bg-card border border-border rounded-md px-4 h-[52px] text-text-primary placeholder-text-subtle text-base outline-none focus:border-primary transition-colors"
                 />
               </div>
-              <div className="rounded-lg border-2 border-dashed border-border p-8 flex flex-col items-center gap-1 bg-card">
-                <Home size={32} className="text-text-subtle" />
-                <p className="text-text-secondary text-sm">Proof of address upload (simulated)</p>
+              <div>
+                <label className="block text-text-secondary text-sm font-medium mb-1.5">Proof of Address</label>
+                <input
+                  ref={proofAddressRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = () => setProofAddress(reader.result as string);
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+                {proofAddress ? (
+                  <div className="relative rounded-lg overflow-hidden border border-border mb-4">
+                    <img src={proofAddress} alt="Proof of address" className="w-full h-40 object-cover" />
+                    <button
+                      onClick={() => { setProofAddress(null); if (proofAddressRef.current) proofAddressRef.current.value = ""; }}
+                      className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
+                    >
+                      <Trash2 size={14} className="text-white" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => proofAddressRef.current?.click()}
+                    className="w-full rounded-lg border-2 border-dashed border-border p-6 flex flex-col items-center gap-1 bg-card hover:border-primary/50 transition-colors"
+                  >
+                    <Home size={28} className="text-text-subtle" />
+                    <p className="text-text-secondary text-xs">Tap to upload proof of address</p>
+                    <p className="text-text-subtle text-[10px]">Utility bill, bank statement • PNG, JPG • Max 10MB</p>
+                  </button>
+                )}
               </div>
             </div>
           </div>
