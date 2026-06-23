@@ -55,8 +55,8 @@ export default function NotificationCenter() {
               <ArrowLeft size={20} className="text-text-primary" />
             </button>
             <div>
-              <h1 className="text-text-primary text-xl font-bold">Notifications</h1>
-              <p className="text-text-secondary text-xs">Stay updated on your activity</p>
+              <h1 className="text-text-primary text-2xl font-bold">Notifications</h1>
+              <p className="text-text-secondary text-sm">Stay updated on your activity</p>
             </div>
           </div>
           {filtered.length > 0 && (
