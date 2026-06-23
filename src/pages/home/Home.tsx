@@ -89,7 +89,7 @@ export default function Home() {
             </div>
             <div className="text-left">
               <h3 className="text-white text-lg font-bold leading-tight">Send Money Now</h3>
-              <p className="text-white/75 text-sm mt-0.5">Low fees · Real-time tracking</p>
+              <p className="text-white/75 text-sm mt-0.5">Low fees · Cash Pickup / Bank Account / Mobile Wallet</p>
             </div>
           </div>
           <ArrowRight size={22} className="text-white/80" />
