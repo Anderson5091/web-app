@@ -54,7 +54,8 @@ export default function Welcome() {
             </div>
           ))}
         </div>
-
+      </div>
+      <div className="relative z-10 flex-1 flex flex-col px-6 pb-4">
         {/* Get Started */}
         <button
           onClick={() => navigate("/register")}
@@ -70,11 +71,6 @@ export default function Welcome() {
         >
           Sign In to Your Account
         </button>
-
-        {/* Demo note */}
-        <div className="bg-warning-dim rounded-md py-1.5 px-4 border border-warning/30 text-center">
-          <p className="text-warning text-2xs font-medium">DEMO · test@quicksend.io / 123456</p>
-        </div>
       </div>
     </div>
   );
