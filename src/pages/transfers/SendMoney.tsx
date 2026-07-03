@@ -196,7 +196,7 @@ export default function SendMoney() {
               </div>
             )}
 
-            <GradientButton title="Review Transfer" onPress={() => setStep(3)} disabled={!isValid} />
+            <GradientButton title="Continue Transfer" onPress={() => setStep(3)} disabled={!isValid} />
           </>
         )}
 
