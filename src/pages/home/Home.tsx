@@ -141,7 +141,7 @@ export default function Home() {
                   } else if (tx.type === "WITHDRAWAL") {
                     navigate(`/withdrawal/${tx.txHash || tx.id}`);
                   } else if (tx.type === "TRANSFER") {
-                    navigate(`/transfer/${tx.id}`);
+                    navigate(`/transfer/${tx.transferId || tx.id}`);
                   }
                 }}
                 className="flex items-center gap-4 bg-card rounded-lg border border-border p-4 mb-2 transition-colors cursor-pointer hover:bg-card-alt"

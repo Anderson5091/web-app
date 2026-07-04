@@ -63,6 +63,7 @@ export interface Transaction {
   status: "PENDING" | "DETECTED" | "COMPLETED" | "FAILED" | "CANCELLED";
   transactionNumber?: string;
   payoutOrderId?: string;
+  transferId?: string;
   createdAt: string;
   transferType?: "internal" | "global";
   recipientName?: string;
