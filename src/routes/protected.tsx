@@ -10,6 +10,7 @@ import Transactions from "../pages/wallet/Transactions";
 import Beneficiaries from "../pages/beneficiaries/Beneficiaries";
 import SendMoney from "../pages/transfers/SendMoney";
 import P2PTransfer from "../pages/transfers/P2PTransfer";
+import TransferTracker from "../pages/transfers/TransferTracker";
 import PayoutTracker from "../pages/payout/PayoutTracker";
 import WithdrawalTracker from "../pages/withdrawal/WithdrawalTracker";
 
@@ -92,6 +93,14 @@ export const protectedRoutes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <SendMoney />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/transfer/:id",
+    element: (
+      <ProtectedRoute>
+        <TransferTracker />
       </ProtectedRoute>
     ),
   },
