@@ -57,7 +57,7 @@ export default function VerifyPhone() {
     setError("");
     try {
       const res = await authApi.verifyOtp(userId, otp);
-      setAuth(res.data.user, res.data.token);
+      setAuth(res.data.user, res.data.token, res.data.refreshToken);
       navigate("/home");
     } catch (err: any) {
       const msg = err?.response?.data?.error || err?.response?.data?.message || "Invalid or expired code";

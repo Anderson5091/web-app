@@ -19,7 +19,7 @@ export function useAuth() {
   const login = useCallback(
     async (credentials: LoginCredentials) => {
       const data = await AuthService.login(credentials);
-      setAuth(data.user, data.token);
+      setAuth(data.user, data.token, data.refreshToken);
       return data;
     },
     [setAuth]

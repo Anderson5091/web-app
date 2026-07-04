@@ -30,7 +30,7 @@ export default function Login() {
     setApiError(null);
     try {
       const res = await AuthService.login({ email: email.trim().toLowerCase(), password });
-      setAuth(res.user, res.token);
+      setAuth(res.user, res.token, res.refreshToken);
       navigate("/home");
     } catch (err: any) {
       const message = err?.response?.data?.error || err?.response?.data?.message || err?.message || "Login failed";
