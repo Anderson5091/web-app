@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useWalletStore } from "../../features/wallet/wallet.store";
-import { ArrowUpRight, ArrowLeftRight, ArrowDownLeft, History, Send } from "lucide-react";
+import { ArrowUpRight, ArrowLeftRight, ArrowDownLeft, History, Send, ArrowRightLeft } from "lucide-react";
 import Loader from "../../components/ui/Loader";
 
 const QUICK_ACTIONS = [
@@ -105,12 +105,14 @@ export default function WalletHome() {
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 ${
-                    isDeposit ? "bg-primary-dim" : tx.type === "WITHDRAWAL" ? "bg-danger-dim" : "bg-warning-dim"
+                    isDeposit ? "bg-primary-dim" : tx.type === "WITHDRAWAL" ? "bg-danger-dim" : tx.transferType === "internal" ? "bg-primary-dim" : "bg-warning-dim"
                   }`}>
                     {isDeposit ? (
                       <ArrowDownLeft size={20} className="text-primary" />
                     ) : tx.type === "WITHDRAWAL" ? (
                       <ArrowUpRight size={20} className="text-danger" />
+                    ) : tx.transferType === "internal" ? (
+                      <ArrowRightLeft size={20} className="text-primary" />
                     ) : (
                       <Send size={20} className="text-warning" />
                     )}

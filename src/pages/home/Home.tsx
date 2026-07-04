@@ -2,7 +2,7 @@ import { useAuthStore } from "../../features/auth/auth.store";
 import { useWalletStore } from "../../features/wallet/wallet.store";
 import { useNotificationStore } from "../../features/notifications/notification.store";
 import { useNavigate } from "react-router-dom";
-import { Send, ArrowDownLeft, ArrowUpRight, History, Verified, ArrowRight, Bell } from "lucide-react";
+import { Send, ArrowDownLeft, ArrowUpRight, ArrowRightLeft, History, Verified, ArrowRight, Bell } from "lucide-react";
 import { useEffect } from "react";
 
 export default function Home() {
@@ -147,12 +147,14 @@ export default function Home() {
                 className="flex items-center gap-4 bg-card rounded-lg border border-border p-4 mb-2 transition-colors cursor-pointer hover:bg-card-alt"
               >
                 <div className={`w-10 h-10 rounded-md flex items-center justify-center ${
-                  isDeposit ? "bg-primary-dim" : tx.type === "WITHDRAWAL" ? "bg-danger-dim" : "bg-warning-dim"
+                  isDeposit ? "bg-primary-dim" : tx.type === "WITHDRAWAL" ? "bg-danger-dim" : tx.transferType === "internal" ? "bg-primary-dim" : "bg-warning-dim"
                 }`}>
                   {isDeposit ? (
                     <ArrowDownLeft size={20} className="text-primary" />
                   ) : tx.type === "WITHDRAWAL" ? (
                     <ArrowUpRight size={20} className="text-danger" />
+                  ) : tx.transferType === "internal" ? (
+                    <ArrowRightLeft size={20} className="text-primary" />
                   ) : (
                     <Send size={20} className="text-warning" />
                   )}
