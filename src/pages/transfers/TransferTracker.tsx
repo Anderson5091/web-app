@@ -108,8 +108,9 @@ function InstantTransferDetail({ tx, onBack }: { tx: Transaction; onBack: () => 
           </p>
           {[
             { label: "Reference", value: tx.transactionNumber || "—" },
+            { label: "Beneficiary", value: tx.recipientName || tx.recipientEmail || "—" },
             { label: "Amount", value: `${Number(tx.amount).toFixed(2)} USDT` },
-            { label: "Fee", value: "Free" },
+            { label: "Fee", value: "0 USDT" },
             { label: "Date", value: new Date(tx.createdAt).toLocaleDateString() },
           ].map((row) => (
             <div
