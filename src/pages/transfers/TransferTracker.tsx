@@ -1,7 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { transferApi } from "../../features/transfers/transfer.api";
+import { walletApi } from "../../features/wallet/wallet.api";
 import type { Transfer, TransferStatus } from "../../features/transfers/transfer.types";
+import type { Transaction } from "../../features/wallet/wallet.types";
 import {
   CheckCircle2,
   Shield,
@@ -12,6 +14,7 @@ import {
   XCircle,
   Send,
   CircleDot,
+  ArrowRightLeft,
 } from "lucide-react";
 import GradientButton from "../../components/ui/GradientButton";
 
@@ -33,11 +36,10 @@ const STATUS_STEPS: {
 const STATUS_ORDER: TransferStatus[] = STATUS_STEPS.map((s) => s.key);
 
 function mapTransferStatus(status: TransferStatus): number {
-  // Map the actual backend status to the appropriate step index
   switch (status) {
     case "DRAFT":
     case "QUOTE_GENERATED":
-      return -1; // before step 0
+      return -1;
     case "PENDING_PAYOUT":
       return 0;
     case "COMPLIANCE_CHECK":
@@ -57,7 +59,6 @@ function mapTransferStatus(status: TransferStatus): number {
   }
 }
 
-/* ─── Extended transfer with beneficiary ─── */
 interface TransferDetail extends Transfer {
   beneficiary?: {
     fullName: string;
@@ -69,39 +70,107 @@ interface TransferDetail extends Transfer {
   currency?: string;
 }
 
+/* ─── Instant Transfer Detail View ─── */
+function InstantTransferDetail({ tx, onBack }: { tx: Transaction; onBack: () => void }) {
+  return (
+    <div className="min-h-screen bg-app flex flex-col">
+      <div className="max-w-xl mx-auto w-full px-4 py-6 space-y-5">
+        <div>
+          <button
+            onClick={onBack}
+            className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-primary font-medium mb-4 transition-colors"
+          >
+            <ArrowLeft size={16} /> Back
+          </button>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-md bg-primary-dim flex items-center justify-center">
+              <ArrowRightLeft size={20} className="text-primary" />
+            </div>
+            <h1 className="text-2xl font-extrabold text-text-primary tracking-tight">Instant Transfer</h1>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-[#1A2640] to-[#151B2B] rounded-xl p-5 border border-border">
+          <p className="text-white text-[40px] font-bold leading-tight">
+            {Number(tx.amount).toFixed(2)} <span className="text-lg font-medium text-white/60">USDT</span>
+          </p>
+          <div className="mt-3">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-success-dim text-success">
+              <CircleDot size={10} />
+              {tx.status}
+            </span>
+          </div>
+        </div>
+
+        <div className="bg-card rounded-xl p-4 border border-border">
+          <p className="text-text-subtle text-[10px] font-semibold tracking-widest uppercase mb-3">
+            Transfer Details
+          </p>
+          {[
+            { label: "Reference", value: tx.transactionNumber || "—" },
+            { label: "Amount", value: `${Number(tx.amount).toFixed(2)} USDT` },
+            { label: "Fee", value: "Free" },
+            { label: "Date", value: new Date(tx.createdAt).toLocaleDateString() },
+          ].map((row) => (
+            <div
+              key={row.label}
+              className="flex justify-between items-center py-2 border-b border-border last:border-0"
+            >
+              <span className="text-text-secondary text-sm">{row.label}</span>
+              <span className="text-text-primary text-sm font-medium text-right">{row.value}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="pb-6">
+          <GradientButton title="Back to Dashboard" onPress={() => navigate("/home")} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main Tracker ─── */
 export default function TransferTracker() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [transfer, setTransfer] = useState<TransferDetail | null>(null);
+  const [walletTx, setWalletTx] = useState<Transaction | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const loadTransfer = useCallback(async () => {
+  const loadData = useCallback(async () => {
     if (!id) return;
+    setLoading(true);
+    setError("");
+
     try {
       const res = await transferApi.getTransfer(id);
       setTransfer(res.data as TransferDetail);
-      setError("");
-    } catch (err: any) {
-      setError(err?.response?.data?.error || "Transfer not found");
+    } catch {
+      try {
+        const res = await walletApi.getTransaction(id);
+        setWalletTx(res.data);
+      } catch {
+        setError("Transfer not found");
+      }
     } finally {
       setLoading(false);
     }
   }, [id]);
 
   useEffect(() => {
-    loadTransfer();
-  }, [loadTransfer]);
+    loadData();
+  }, [loadData]);
 
-  // Auto-refresh while transfer is still in progress
+  // Auto-refresh while transfer is in progress
   useEffect(() => {
     if (!transfer) return;
     const terminal: TransferStatus[] = ["COMPLETED", "DELIVERED", "FAILED"];
     if (terminal.includes(transfer.status)) return;
-
-    const interval = setInterval(loadTransfer, 8000);
+    const interval = setInterval(loadData, 8000);
     return () => clearInterval(interval);
-  }, [transfer?.status, loadTransfer]);
+  }, [transfer?.status, loadData]);
 
   if (loading) {
     return (
@@ -112,6 +181,11 @@ export default function TransferTracker() {
         </div>
       </div>
     );
+  }
+
+  // Internal transfer — show minimal detail view
+  if (walletTx) {
+    return <InstantTransferDetail tx={walletTx} onBack={() => navigate("/wallet/transactions")} />;
   }
 
   if (error || !transfer) {
@@ -144,7 +218,6 @@ export default function TransferTracker() {
   return (
     <div className="min-h-screen bg-app flex flex-col">
       <div className="max-w-xl mx-auto w-full px-4 py-6 space-y-5">
-        {/* Header */}
         <div>
           <button
             onClick={() => navigate("/wallet/transactions")}
@@ -155,7 +228,6 @@ export default function TransferTracker() {
           <h1 className="text-2xl font-extrabold text-text-primary tracking-tight">Track Transfer</h1>
         </div>
 
-        {/* Summary Card */}
         <div className="bg-gradient-to-br from-[#1A2640] to-[#151B2B] rounded-xl p-5 border border-border">
           <p className="text-white/70 text-sm mb-1">
             To {transfer.beneficiary?.fullName || "Recipient"}
@@ -184,7 +256,6 @@ export default function TransferTracker() {
           </div>
         </div>
 
-        {/* Transfer Progress */}
         <div>
           <h2 className="text-text-primary text-lg font-semibold mb-3">Transfer Progress</h2>
           <div className="bg-card rounded-xl p-4 border border-border">
@@ -195,7 +266,6 @@ export default function TransferTracker() {
 
               return (
                 <div key={step.key} className="flex gap-3">
-                  {/* Dot + line */}
                   <div className="flex flex-col items-center w-7">
                     <div
                       className={`w-7 h-7 rounded-full flex items-center justify-center border-2 z-10 transition-all duration-500 ${
@@ -221,7 +291,6 @@ export default function TransferTracker() {
                     )}
                   </div>
 
-                  {/* Step info */}
                   <div className="pb-4 flex-1">
                     <div className="flex items-center gap-1.5">
                       <StepIcon
@@ -244,7 +313,6 @@ export default function TransferTracker() {
           </div>
         </div>
 
-        {/* Transfer Details */}
         <div className="bg-card rounded-xl p-4 border border-border">
           <p className="text-text-subtle text-[10px] font-semibold tracking-widest uppercase mb-3">
             Transfer Details
@@ -269,7 +337,6 @@ export default function TransferTracker() {
           ))}
         </div>
 
-        {/* Failed State */}
         {isFailed && (
           <div className="bg-danger-dim border border-danger/30 rounded-xl p-4 text-center">
             <XCircle size={32} className="text-danger mx-auto mb-2" />
@@ -280,7 +347,6 @@ export default function TransferTracker() {
           </div>
         )}
 
-        {/* Completed State */}
         {(transfer.status === "COMPLETED" || transfer.status === "DELIVERED") && (
           <div className="bg-success-dim border border-success/30 rounded-xl p-4 text-center">
             <CheckCircle2 size={32} className="text-success mx-auto mb-2" />
@@ -291,7 +357,6 @@ export default function TransferTracker() {
           </div>
         )}
 
-        {/* Footer Actions */}
         <div className="space-y-3 pb-6">
           <GradientButton
             title="Back to Dashboard"

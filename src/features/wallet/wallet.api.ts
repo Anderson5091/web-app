@@ -8,6 +8,8 @@ export const walletApi = {
 
   getTransactions: () => api.get<Transaction[]>("/wallet/transactions"),
 
+  getTransaction: (id: string) => api.get<Transaction>(`/wallet/transactions/${id}`),
+
   withdraw: (data: { network: string; address: string; amount: string }) =>
     api.post<WithdrawalResponse>("/withdrawals", {
       ...data,
