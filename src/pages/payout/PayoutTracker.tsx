@@ -1,12 +1,10 @@
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePayoutStore } from "../../features/payout/payout.store";
-import type { PayoutOrder, PayoutStatus } from "../../features/payout/payout.types";
+import type { PayoutStatus } from "../../features/payout/payout.types";
 import GradientButton from "../../components/ui/GradientButton";
 import {
   CheckCircle2,
-  Shield,
-  Landmark,
   RefreshCw,
   ArrowLeft,
   Loader2,
@@ -29,8 +27,6 @@ const PAYOUT_STATUS_STEPS: {
   { key: "CONFIRMED", label: "Confirmed", desc: "Confirmed by partner", icon: CheckCircle2 },
   { key: "DELIVERED", label: "Delivered", desc: "Funds delivered to recipient", icon: Send },
 ];
-
-const STATUS_ORDER: PayoutStatus[] = PAYOUT_STATUS_STEPS.map((s) => s.key);
 
 function mapPayoutStatus(status: PayoutStatus): number {
   // Map the actual backend status to the appropriate step index

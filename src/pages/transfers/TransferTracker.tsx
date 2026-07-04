@@ -33,8 +33,6 @@ const STATUS_STEPS: {
   { key: "COMPLETED", label: "Completed", desc: "Transfer finalized successfully", icon: CheckCircle2 },
 ];
 
-const STATUS_ORDER: TransferStatus[] = STATUS_STEPS.map((s) => s.key);
-
 function mapTransferStatus(status: TransferStatus): number {
   switch (status) {
     case "DRAFT":
@@ -72,6 +70,7 @@ interface TransferDetail extends Transfer {
 
 /* ─── Instant Transfer Detail View ─── */
 function InstantTransferDetail({ tx, onBack }: { tx: Transaction; onBack: () => void }) {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-app flex flex-col">
       <div className="max-w-xl mx-auto w-full px-4 py-6 space-y-5">
