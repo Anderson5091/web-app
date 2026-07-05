@@ -1,8 +1,9 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBeneficiaryStore } from "../../features/beneficiaries/beneficiary.store";
 import { useWalletStore } from "../../features/wallet/wallet.store";
 import { useTransferStore } from "../../features/transfers/transfer.store";
+import { feeApi } from "../../features/fees/fee.api";
 import { ArrowLeft, Check, CheckCircle2, Shield } from "lucide-react";
 import GradientButton from "../../components/ui/GradientButton";
 import type { Beneficiary } from "../../features/beneficiaries/beneficiary.types";
@@ -44,9 +45,10 @@ export default function SendMoney() {
   const maxAmount = wallet ? parseFloat(wallet.availableBalance) : 0;
   const country = selectedBen?.country || "Philippines";
   const fxInfo = FX_RATES[country] || { rate: 1, currency: "USD", flag: "🌍" };
-  const fee = useMemo(() => {
-    if (!numAmount) return 0;
-    return Math.max(0.5, numAmount * 0.015);
+  const [fee, setFee] = useState(0);
+  useEffect(() => {
+    if (!numAmount) { setFee(0); return; }
+    feeApi.getEstimate("WEB_TRANSFER", numAmount).then((r) => setFee(r.totalFee)).catch(() => setFee(0));
   }, [numAmount]);
   const total = numAmount + fee;
   const localAmount = numAmount * fxInfo.rate;

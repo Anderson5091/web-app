@@ -1,19 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
 import { useWalletStore } from "../../features/wallet/wallet.store";
 import { WalletService } from "../../features/wallet/wallet.service";
+import { feeApi } from "../../features/fees/fee.api";
 import GradientButton from "../../components/ui/GradientButton";
 import type { WithdrawalResponse } from "../../features/wallet/wallet.types";
 
 const NETWORKS = ["BASE", "ETHEREUM", "POLYGON", "SOLANA"];
-
-const FEE_SCHEDULE: Record<string, number> = {
-  BASE: 1,
-  POLYGON: 1,
-  SOLANA: 1,
-  ETHEREUM: 10,
-};
 
 export default function Withdraw() {
   const navigate = useNavigate();
@@ -25,12 +19,16 @@ export default function Withdraw() {
   const [error, setError] = useState<string | null>(null);
   const [withdrawalResult, setWithdrawalResult] =
     useState<WithdrawalResponse | null>(null);
+  const [fee, setFee] = useState(0);
 
   const maxAmount = wallet ? parseFloat(wallet.availableBalance) : 0;
-  const fee = FEE_SCHEDULE[network] || 1;
-  const receiveAmount = amount
-    ? Math.max(0, parseFloat(amount) - fee)
-    : 0;
+  const parsedAmount = parseFloat(amount) || 0;
+  const receiveAmount = amount ? Math.max(0, parsedAmount - fee) : 0;
+
+  useEffect(() => {
+    if (!parsedAmount) { setFee(0); return; }
+    feeApi.getEstimate("WEB_WITHDRAW", parsedAmount).then((r) => setFee(r.totalFee)).catch(() => setFee(0));
+  }, [parsedAmount]);
 
   const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();

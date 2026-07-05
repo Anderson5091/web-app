@@ -3,6 +3,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { Copy, Check, Info, TriangleAlert, ArrowLeft, Clock, ExternalLink, Loader, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { WalletService } from "../../features/wallet/wallet.service";
+import { feeApi } from "../../features/fees/fee.api";
 import type { DepositStatus } from "../../features/wallet/wallet.types";
 
 const NETWORKS = [
@@ -12,7 +13,6 @@ const NETWORKS = [
   { key: "SOLANA", name: "Solana", symbol: "Native-PDA", icon: "S" },
 ];
 
-const FEE_RATE = 0.01;
 const REQUIRED_CONFIRMATIONS = 5;
 
 type Step = "network" | "amount" | "address" | "pending" | "completed";
@@ -29,10 +29,15 @@ export default function Deposit() {
   const [error, setError] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(300);
   const [txHashCopied, setTxHashCopied] = useState(false);
+  const [fee, setFee] = useState(0);
 
   const parsedAmount = parseFloat(amount) || 0;
-  const fee = parsedAmount * FEE_RATE;
   const netAmount = parsedAmount - fee;
+
+  useEffect(() => {
+    if (!parsedAmount) { setFee(0); return; }
+    feeApi.getEstimate("WEB_DEPOSIT", parsedAmount).then((r) => setFee(r.totalFee)).catch(() => setFee(0));
+  }, [parsedAmount]);
 
   const pollStatus = useCallback(async () => {
     if (!depositId) return;
@@ -223,7 +228,7 @@ export default function Deposit() {
                 <span className="text-text-primary font-medium">{parsedAmount.toFixed(2)} USDT</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-text-secondary">Fee (1%)</span>
+                <span className="text-text-secondary">Fee</span>
                 <span className="text-text-primary font-medium">{fee.toFixed(2)} USDT</span>
               </div>
               <div className="border-t border-border pt-2 flex justify-between text-sm">
