@@ -33,7 +33,7 @@ export default function Profile() {
     .toUpperCase();
 
   const kycStatusMap: Record<string, { label: string; color: string }> = {
-    none: { label: "Unverified", color: "#707B90" },
+    none: { label: "Unverified", color: "#F5A623" },
     pending: { label: "Pending Review", color: "#F5A623" },
     approved: { label: `Tier ${user?.kycTier || 0}`, color: "#00D6A3" },
     rejected: { label: "Rejected", color: "#FF4E4E" },

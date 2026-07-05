@@ -56,7 +56,7 @@ export default function Settings() {
   };
 
   const kycStatusMap: Record<string, { label: string; color: string }> = {
-    none: { label: "Not Started", color: "#707B90" },
+    none: { label: "Not Started", color: "#F5A623" },
     pending: { label: "Pending Review", color: "#F5A623" },
     approved: { label: `Tier ${user?.kycTier || 0} — ${["", "Basic", "ID Verified", "Full"][user?.kycTier || 0]}`, color: "#00D6A3" },
     rejected: { label: "Rejected", color: "#FF4E4E" },
