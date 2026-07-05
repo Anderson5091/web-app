@@ -16,7 +16,7 @@ const FAQ_ITEMS = [
 
 const contactOptions = [
   { icon: Mail, label: "Email Support", sub: "support@quicksend.io", color: "#00D6A3", href: "mailto:support@quicksend.io" },
-  { icon: MessageCircle, label: "Live Chat", sub: "Available 9am–6pm UTC", color: "#0084FF" },
+  { icon: MessageCircle, label: "Live Chat", sub: "Available 9am–6pm UTC", color: "#0084FF", to: "/settings/chat" },
   { icon: Phone, label: "Phone Support", sub: "+1 (800) 555-0199 — Pro users", color: "#F5A623" },
   { icon: Users, label: "Community Forum", sub: "Ask the community", color: "#A78BFA", href: "https://quicksend.io/community" },
 ];
@@ -78,20 +78,25 @@ export default function Support() {
         {/* Contact */}
         <p className="text-text-subtle text-[10px] font-semibold tracking-wider uppercase mb-2 ml-1">Contact Us</p>
         <div className="grid grid-cols-2 gap-2 mb-6">
-          {contactOptions.map((opt) => (
-            <a
-              key={opt.label}
-              href={opt.href || "#"}
-              onClick={!opt.href ? (e) => e.preventDefault() : undefined}
-              className="bg-card rounded-xl border border-border p-4 hover:bg-card-alt transition-colors"
-            >
-              <div className="w-11 h-11 rounded-md flex items-center justify-center mb-2" style={{ backgroundColor: opt.color + "20" }}>
-                <opt.icon size={20} color={opt.color} />
-              </div>
-              <p className="text-text-primary text-sm font-semibold">{opt.label}</p>
-              <p className="text-text-subtle text-[10px] mt-0.5 leading-tight">{opt.sub}</p>
-            </a>
-          ))}
+          {(contactOptions as (typeof contactOptions[number] & { to?: string })[]).map((opt) => {
+            const Tag = opt.to ? "button" : "a";
+            const extraProps = opt.to
+              ? { onClick: () => navigate(opt.to!) }
+              : { href: opt.href || "#", onClick: (e: React.MouseEvent) => { if (!opt.href) e.preventDefault(); } };
+            return (
+              <Tag
+                key={opt.label}
+                {...extraProps}
+                className="bg-card rounded-xl border border-border p-4 hover:bg-card-alt transition-colors text-left"
+              >
+                <div className="w-11 h-11 rounded-md flex items-center justify-center mb-2" style={{ backgroundColor: opt.color + "20" }}>
+                  <opt.icon size={20} color={opt.color} />
+                </div>
+                <p className="text-text-primary text-sm font-semibold">{opt.label}</p>
+                <p className="text-text-subtle text-[10px] mt-0.5 leading-tight">{opt.sub}</p>
+              </Tag>
+            );
+          })}
         </div>
 
         {/* FAQ */}

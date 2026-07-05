@@ -21,6 +21,7 @@ import Profile from "../pages/settings/Profile";
 import Security from "../pages/settings/Security";
 import Sessions from "../pages/settings/Sessions";
 import Support from "../pages/settings/Support";
+import Chat from "../pages/settings/Chat";
 import Privacy from "../pages/settings/Privacy";
 
 /**
@@ -186,6 +187,14 @@ export const protectedRoutes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <Support />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/settings/chat",
+    element: (
+      <ProtectedRoute>
+        <Chat />
       </ProtectedRoute>
     ),
   },
