@@ -18,6 +18,10 @@ import KYC from "../pages/compliance/KYC";
 import NotificationCenter from "../pages/notifications/NotificationCenter";
 import Settings from "../pages/settings/Settings";
 import Profile from "../pages/settings/Profile";
+import Security from "../pages/settings/Security";
+import Sessions from "../pages/settings/Sessions";
+import Support from "../pages/settings/Support";
+import Privacy from "../pages/settings/Privacy";
 
 /**
  * All routes that require authentication.
@@ -158,6 +162,38 @@ export const protectedRoutes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <Profile />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/settings/security",
+    element: (
+      <ProtectedRoute>
+        <Security />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/settings/sessions",
+    element: (
+      <ProtectedRoute>
+        <Sessions />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/settings/support",
+    element: (
+      <ProtectedRoute>
+        <Support />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/settings/privacy",
+    element: (
+      <ProtectedRoute>
+        <Privacy />
       </ProtectedRoute>
     ),
   },

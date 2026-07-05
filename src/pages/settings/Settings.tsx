@@ -101,8 +101,8 @@ export default function Settings() {
         <p className="text-text-subtle text-[10px] font-semibold tracking-wider uppercase mb-2 ml-1">Account</p>
         <div className="bg-card rounded-lg border border-border overflow-hidden mb-6">
           <Row icon={User} label="Profile" subtitle="Edit your personal info" onPress={() => navigate("/settings/profile")} color="#00D6A3" />
-          <Row icon={Lock} label="Security" subtitle="Password, sessions" color="#0084FF" />
-          <Row icon={Smartphone} label="Active Sessions" subtitle="Manage logged-in devices" color="#F5A623" />
+          <Row icon={Lock} label="Security" subtitle="Password, sessions" onPress={() => navigate("/settings/security")} color="#0084FF" />
+          <Row icon={Smartphone} label="Active Sessions" subtitle="Manage logged-in devices" onPress={() => navigate("/settings/sessions")} color="#F5A623" />
         </div>
 
         {/* Notifications */}
@@ -144,8 +144,8 @@ export default function Settings() {
         <p className="text-text-subtle text-[10px] font-semibold tracking-wider uppercase mb-2 ml-1">App</p>
         <div className="bg-card rounded-lg border border-border overflow-hidden mb-8">
           <Row icon={Info} label="App Version" rightText="1.0.0" color="#707B90" />
-          <Row icon={HelpCircle} label="Help & Support" color="#707B90" />
-          <Row icon={FileText} label="Privacy Policy" color="#707B90" />
+          <Row icon={HelpCircle} label="Help & Support" onPress={() => navigate("/settings/support")} color="#707B90" />
+          <Row icon={FileText} label="Privacy Policy" onPress={() => navigate("/settings/privacy")} color="#707B90" />
         </div>
 
         {/* Logout */}
