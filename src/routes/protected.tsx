@@ -1,6 +1,5 @@
 import type { RouteObject } from "react-router-dom";
 import Home from "../pages/home/Home";
-import ProfileSetup from "../pages/onboarding/ProfileSetup";
 import ProtectedRoute from "../components/guards/ProtectedRoute";
 import WalletHome from "../pages/wallet/WalletHome";
 import Deposit from "../pages/wallet/Deposit";
@@ -18,6 +17,7 @@ import ComplianceCenter from "../pages/compliance/ComplianceCenter";
 import KYC from "../pages/compliance/KYC";
 import NotificationCenter from "../pages/notifications/NotificationCenter";
 import Settings from "../pages/settings/Settings";
+import Profile from "../pages/settings/Profile";
 
 /**
  * All routes that require authentication.
@@ -29,14 +29,6 @@ export const protectedRoutes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <Home />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/onboarding/profile",
-    element: (
-      <ProtectedRoute>
-        <ProfileSetup />
       </ProtectedRoute>
     ),
   },
@@ -158,6 +150,14 @@ export const protectedRoutes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <Settings />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/settings/profile",
+    element: (
+      <ProtectedRoute>
+        <Profile />
       </ProtectedRoute>
     ),
   },

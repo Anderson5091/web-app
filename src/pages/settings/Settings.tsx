@@ -100,7 +100,7 @@ export default function Settings() {
         {/* Account */}
         <p className="text-text-subtle text-[10px] font-semibold tracking-wider uppercase mb-2 ml-1">Account</p>
         <div className="bg-card rounded-lg border border-border overflow-hidden mb-6">
-          <Row icon={User} label="Profile" subtitle="Edit your personal info" onPress={() => navigate("/onboarding/profile")} color="#00D6A3" />
+          <Row icon={User} label="Profile" subtitle="Edit your personal info" onPress={() => navigate("/settings/profile")} color="#00D6A3" />
           <Row icon={Lock} label="Security" subtitle="Password, sessions" color="#0084FF" />
           <Row icon={Smartphone} label="Active Sessions" subtitle="Manage logged-in devices" color="#F5A623" />
         </div>

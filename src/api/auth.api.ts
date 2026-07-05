@@ -10,4 +10,5 @@ export const authApi = {
   logout: () => api.post("/auth/logout"),
   refresh: () => api.post("/auth/refresh"),
   me: () => api.get("/auth/me"),
+  updateProfile: (data: { fullName?: string; phone?: string; country?: string }) => api.put("/auth/me", data),
 };
