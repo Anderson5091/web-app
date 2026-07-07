@@ -98,11 +98,15 @@ export default function KYC() {
       try {
         const idImage = docFront.includes(",") ? docFront.split(",")[1] : docFront;
         const selfieImage = selfie.includes(",") ? selfie.split(",")[1] : selfie;
-        const result = await submitTier2({
+        const payload: any = {
           idImage,
           selfieImage,
           documentType: docType === "passport" ? "PASSPORT" : docType === "drivers_license" ? "DRIVER_LICENSE" : "NATIONAL_ID",
-        });
+        };
+        if (docBack) {
+          payload.idImageBack = docBack.includes(",") ? docBack.split(",")[1] : docBack;
+        }
+        const result = await submitTier2(payload);
         if (result) {
           if (result.status === "APPROVED") {
             updateUser({ ...user, kycTier: 2, kycStatus: "approved" });
@@ -357,7 +361,7 @@ export default function KYC() {
               ].map(d => (
                 <button
                   key={d.key}
-                  onClick={() => { setDocType(d.key); setDocFront(null); }}
+                  onClick={() => { setDocType(d.key); setDocFront(null); setDocBack(null); }}
                   className={`flex-1 py-2.5 rounded-md border text-xs font-medium transition-colors ${
                     docType === d.key
                       ? "border-primary bg-primary-dim text-primary"
@@ -369,7 +373,9 @@ export default function KYC() {
               ))}
             </div>
 
-            <label className="block text-text-secondary text-sm font-medium mb-1.5">Upload ID Document</label>
+            <label className="block text-text-secondary text-sm font-medium mb-1.5">
+              {docType === "passport" ? "Upload Passport Page" : "Upload Front Side"}
+            </label>
             <input
               ref={docFrontRef}
               type="file"
@@ -385,7 +391,7 @@ export default function KYC() {
             />
             {docFront ? (
               <div className="relative rounded-lg overflow-hidden border border-border mb-4">
-                <img src={`data:image/jpeg;base64,${docFront}`} alt="ID document" className="w-full h-36 object-cover" />
+                <img src={`data:image/jpeg;base64,${docFront}`} alt="ID front" className="w-full h-36 object-cover" />
                 <button
                   onClick={() => { setDocFront(null); if (docFrontRef.current) docFrontRef.current.value = ""; }}
                   className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
@@ -399,9 +405,48 @@ export default function KYC() {
                 className="w-full rounded-lg border-2 border-dashed border-border p-6 flex flex-col items-center gap-1 bg-card mb-4 hover:border-primary/50 transition-colors"
               >
                 <CloudUpload size={28} className="text-text-subtle" />
-                <p className="text-text-secondary text-xs">Tap to upload ID</p>
+                <p className="text-text-secondary text-xs">Tap to upload {docType === "passport" ? "passport page" : "front side"}</p>
                 <p className="text-text-subtle text-[10px]">PNG, JPG</p>
               </button>
+            )}
+
+            {docType !== "passport" && (
+              <>
+                <label className="block text-text-secondary text-sm font-medium mb-1.5">Upload Back Side</label>
+                <input
+                  ref={docBackRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const b64 = await toBase64(file);
+                      setDocBack(b64);
+                    }
+                  }}
+                />
+                {docBack ? (
+                  <div className="relative rounded-lg overflow-hidden border border-border mb-4">
+                    <img src={`data:image/jpeg;base64,${docBack}`} alt="ID back" className="w-full h-36 object-cover" />
+                    <button
+                      onClick={() => { setDocBack(null); if (docBackRef.current) docBackRef.current.value = ""; }}
+                      className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
+                    >
+                      <Trash2 size={14} className="text-white" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => docBackRef.current?.click()}
+                    className="w-full rounded-lg border-2 border-dashed border-border p-6 flex flex-col items-center gap-1 bg-card mb-4 hover:border-primary/50 transition-colors"
+                  >
+                    <CloudUpload size={28} className="text-text-subtle" />
+                    <p className="text-text-secondary text-xs">Tap to upload back side</p>
+                    <p className="text-text-subtle text-[10px]">PNG, JPG</p>
+                  </button>
+                )}
+              </>
             )}
 
             <label className="block text-text-secondary text-sm font-medium mb-1.5">Selfie</label>

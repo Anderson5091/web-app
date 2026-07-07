@@ -20,6 +20,7 @@ export const complianceApi = {
 
   submitTier2: async (payload: {
     idImage: string;
+    idImageBack?: string;
     selfieImage: string;
     documentType: string;
   }): Promise<{ status: string; tier: number; details: any }> => {

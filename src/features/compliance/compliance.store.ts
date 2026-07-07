@@ -11,7 +11,7 @@ interface ComplianceState {
 
   fetchStatus: () => Promise<void>;
   submitTier1: (payload: { fullName: string; dateOfBirth: string; nationality: string; country: string; address: string }) => Promise<{ status: string; tier: number; details: any } | null>;
-  submitTier2: (payload: { idImage: string; selfieImage: string; documentType: string }) => Promise<{ status: string; tier: number; details: any } | null>;
+  submitTier2: (payload: { idImage: string; idImageBack?: string; selfieImage: string; documentType: string }) => Promise<{ status: string; tier: number; details: any } | null>;
   submitTier3: (payload: { poaImage: string; sourceOfFunds?: string }) => Promise<{ status: string; tier: number; details: any } | null>;
   clearResult: () => void;
   clearError: () => void;
