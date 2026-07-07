@@ -313,7 +313,7 @@ export default function KYC() {
                 <input
                   value={dob}
                   onChange={e => setDob(e.target.value)}
-                  placeholder="YYYY-MM-DD"
+                  placeholder="DD-MM-YYYY"
                   className="w-full bg-card border border-border rounded-md px-4 h-[52px] text-text-primary placeholder-text-subtle text-base outline-none focus:border-primary transition-colors"
                 />
               </div>
