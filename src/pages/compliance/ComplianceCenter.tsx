@@ -99,7 +99,7 @@ export default function ComplianceCenter() {
     fetchStatus,
   } = useComplianceStore();
 
-
+  const riskColor = "#00D6A3";
 
   useEffect(() => {
     fetchStatus();
@@ -107,9 +107,7 @@ export default function ComplianceCenter() {
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (isLoading && !kycStatus) {
-  const riskColor = "#00D6A3";
-
-  return (
+    return (
       <div className="min-h-screen bg-app-bg flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <Loader2 size={32} className="animate-spin text-primary" />
