@@ -1,96 +1,75 @@
 import { create } from "zustand";
-import type { ComplianceOverview, KycDocument } from "./compliance.types";
+import type { KycStatusResult } from "./compliance.types";
 import { complianceApi } from "./compliance.api";
 
 interface ComplianceState {
-  overview: ComplianceOverview | null;
-  documents: KycDocument[];
+  kycStatus: KycStatusResult | null;
   isLoading: boolean;
-  isUploading: boolean;
-  isUpgrading: boolean;
-  uploadMessage: string | null;
-  upgradeMessage: string | null;
+  isSubmitting: boolean;
+  submitResult: { status: string; tier: number; details: any } | null;
   error: string | null;
 
-  fetchOverview: () => Promise<void>;
-  uploadDocument: (documentType: string, fileUrl?: string) => Promise<void>;
-  requestTierUpgrade: () => Promise<void>;
-  clearMessages: () => void;
+  fetchStatus: () => Promise<void>;
+  submitTier1: (payload: { fullName: string; dateOfBirth: string; nationality: string; country: string; address: string }) => Promise<{ status: string; tier: number; details: any } | null>;
+  submitTier2: (payload: { idImage: string; selfieImage: string; documentType: string }) => Promise<{ status: string; tier: number; details: any } | null>;
+  submitTier3: (payload: { poaImage: string; sourceOfFunds?: string }) => Promise<{ status: string; tier: number; details: any } | null>;
+  clearResult: () => void;
+  clearError: () => void;
 }
 
 export const useComplianceStore = create<ComplianceState>((set) => ({
-  overview: null,
-  documents: [],
+  kycStatus: null,
   isLoading: false,
-  isUploading: false,
-  isUpgrading: false,
-  uploadMessage: null,
-  upgradeMessage: null,
+  isSubmitting: false,
+  submitResult: null,
   error: null,
 
-  fetchOverview: async () => {
+  fetchStatus: async () => {
     set({ isLoading: true, error: null });
     try {
-      const res = await complianceApi.getOverview();
-      const data = res.data as any;
-      const overview: ComplianceOverview = {
-        kycProfile: data.profile || data.kycProfile,
-        documents: data.documents || [],
-        amlCheck: data.amlCheck || null,
-        sanctionsHits: data.sanctionsHits || [],
-        riskScore: data.riskScore
-          ? { ...data.riskScore, factors: Array.isArray(data.riskScore.factors) ? data.riskScore.factors : [] }
-          : data.riskScore,
-        recentCases: data.recentCases || [],
-        limits: data.limits || { dailySendLimit: 1000, monthlySendLimit: 10000, remainingDaily: 1000, remainingMonthly: 10000 },
-      };
-      set({
-        overview,
-        documents: overview.documents,
-        isLoading: false,
-      });
+      const data = await complianceApi.getStatus();
+      set({ kycStatus: data, isLoading: false });
     } catch (err: any) {
-      set({
-        error: err.message || "Failed to fetch compliance data",
-        isLoading: false,
-      });
+      set({ error: err.message || "Failed to fetch KYC status", isLoading: false });
     }
   },
 
-  uploadDocument: async (documentType, fileUrl) => {
-    set({ isUploading: true, error: null, uploadMessage: null });
+  submitTier1: async (payload) => {
+    set({ isSubmitting: true, error: null, submitResult: null });
     try {
-      const res = await complianceApi.uploadDocument(documentType, fileUrl);
-      set((state) => ({
-        documents: [...state.documents, res.data],
-        isUploading: false,
-        uploadMessage: `${documentType.replace("_", " ")} uploaded successfully. Pending review.`,
-      }));
+      const result = await complianceApi.submitTier1(payload);
+      set({ isSubmitting: false, submitResult: result });
+      return result;
     } catch (err: any) {
-      set({
-        error: err.message || "Upload failed",
-        isUploading: false,
-      });
+      set({ error: err.message || "Tier 1 submission failed", isSubmitting: false });
+      return null;
     }
   },
 
-  requestTierUpgrade: async () => {
-    set({ isUpgrading: true, error: null, upgradeMessage: null });
+  submitTier2: async (payload) => {
+    set({ isSubmitting: true, error: null, submitResult: null });
     try {
-      const res = await complianceApi.requestTierUpgrade();
-      set({
-        isUpgrading: false,
-        upgradeMessage: res.data.message,
-      });
+      const result = await complianceApi.submitTier2(payload);
+      set({ isSubmitting: false, submitResult: result });
+      return result;
     } catch (err: any) {
-      set({
-        error: err.message || "Upgrade request failed",
-        isUpgrading: false,
-      });
+      set({ error: err.message || "Tier 2 submission failed", isSubmitting: false });
+      return null;
     }
   },
 
-  clearMessages: () => {
-    set({ uploadMessage: null, upgradeMessage: null, error: null });
+  submitTier3: async (payload) => {
+    set({ isSubmitting: true, error: null, submitResult: null });
+    try {
+      const result = await complianceApi.submitTier3(payload);
+      set({ isSubmitting: false, submitResult: result });
+      return result;
+    } catch (err: any) {
+      set({ error: err.message || "Tier 3 submission failed", isSubmitting: false });
+      return null;
+    }
   },
+
+  clearResult: () => set({ submitResult: null }),
+  clearError: () => set({ error: null }),
 }));

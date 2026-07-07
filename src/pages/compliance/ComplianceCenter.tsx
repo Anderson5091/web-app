@@ -14,16 +14,17 @@ import {
   Ban,
   ArrowUpRight,
   ArrowLeft,
+  Info,
 } from "lucide-react";
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
-const tierLabels = ["", "Basic", "Verified", "Enhanced"];
+const tierLabels = ["Unverified", "Basic", "Verified", "Enhanced"];
 const tierDescriptions = [
-  "",
-  "Limited sending ($1K/day)",
-  "Medium limits ($10K/day)",
-  "High limits ($100K/day)",
+  "No transactions until verified",
+  "Limited sending ($500/month)",
+  "Medium limits ($5,000/month)",
+  "High limits (unlimited)",
 ];
 
 
@@ -110,24 +111,22 @@ export default function ComplianceCenter() {
   const fromKyc = state?.from === "/compliance/kyc";
   const kycFrom = state?.kycFrom || "/compliance";
   const {
-    overview,
+    kycStatus,
     isLoading,
-    isUpgrading,
-    uploadMessage,
-    upgradeMessage,
-    fetchOverview,
-    requestTierUpgrade,
+    isSubmitting,
+    fetchStatus,
+    submitTier1,
     clearMessages,
   } = useComplianceStore();
 
 
 
   useEffect(() => {
-    fetchOverview();
-  }, [fetchOverview]);
+    fetchStatus();
+  }, [fetchStatus]);
 
   // ── Loading ──────────────────────────────────────────────────────────────
-  if (isLoading && !overview) {
+  if (isLoading && !kycStatus) {
     return (
       <div className="min-h-screen bg-app-bg flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
@@ -138,17 +137,17 @@ export default function ComplianceCenter() {
     );
   }
 
-  const profile = overview?.kycProfile;
-  const risk = overview?.riskScore;
-  const aml = overview?.amlCheck;
-  const limits = overview?.limits;
-  const riskGauge = risk ? risk.score : 0;
-  const riskColor =
-    risk?.level === "LOW"
-      ? "#00D6A3"
-      : risk?.level === "MEDIUM"
-      ? "#F5A623"
-      : "#FF4E4E";
+  const profile = kycStatus?.profile;
+  const limits = kycStatus?.limits;
+  const currentTier = kycStatus?.userTier ?? 0;
+  const currentStatus = kycStatus?.userStatus ?? "none";
+
+  const statusKey: StatusKey =
+    currentStatus === "approved" ? "APPROVED" :
+    currentStatus === "rejected" ? "REJECTED" : "PENDING";
+
+  const riskGauge = 15;
+  const riskColor = "#00D6A3";
 
   return (
     <div className="min-h-screen bg-app-bg">
@@ -176,12 +175,12 @@ export default function ComplianceCenter() {
         </div>
 
         {/* ── Toast message ─────────────────────────────────────────────── */}
-        {(uploadMessage || upgradeMessage) && (
+        {kycStatus?.lastEvent && (
           <div className="flex items-center gap-3 bg-primary-dim border border-primary-border rounded-xl p-4 text-sm text-primary font-medium">
-            <CheckCircle2 size={18} className="shrink-0" />
-            <span className="flex-1">{uploadMessage || upgradeMessage}</span>
+            <Info size={18} className="shrink-0" />
+            <span className="flex-1">Last event: {kycStatus.lastEvent.eventType} — {kycStatus.lastEvent.status}</span>
             <button
-              onClick={clearMessages}
+              onClick={() => {}}
               className="text-primary/60 hover:text-primary font-bold text-lg leading-none"
             >
               &times;
@@ -248,19 +247,14 @@ export default function ComplianceCenter() {
                   {/* Tier upgrade */}
                   <div className="mt-5 pt-4 border-t border-border flex items-center justify-between">
                     <div>
-                      <p className="text-text-primary font-semibold text-sm">Upgrade to Tier 2</p>
-                      <p className="text-text-subtle text-xs mt-0.5">{tierDescriptions[2]}</p>
+                      <p className="text-text-primary font-semibold text-sm">Upgrade to Tier {currentTier + 1}</p>
+                      <p className="text-text-subtle text-xs mt-0.5">{tierDescriptions[currentTier + 1] || "Complete all verifications"}</p>
                     </div>
                     <button
-                      onClick={requestTierUpgrade}
-                      disabled={isUpgrading}
+                      onClick={() => navigate("/compliance/kyc", { state: { from: "/compliance" } })}
                       className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#00D6A3] to-[#0084FF] text-white rounded-lg text-sm font-bold transition-opacity hover:opacity-90 disabled:opacity-50"
                     >
-                      {isUpgrading ? (
-                        <Loader2 size={15} className="animate-spin" />
-                      ) : (
-                        <ArrowUpRight size={15} />
-                      )}
+                      <ArrowUpRight size={15} />
                       Upgrade
                     </button>
                   </div>
@@ -271,54 +265,45 @@ export default function ComplianceCenter() {
             </SectionCard>
           </div>
 
-          {/* Risk Score Card */}
-          <SectionCard title="Risk Score" icon={Gauge}>
-            {risk ? (
-              <div className="flex flex-col items-center">
-                {/* SVG gauge */}
-                <div className="relative w-28 h-28 mb-3">
-                  <svg className="w-28 h-28 -rotate-90" viewBox="0 0 120 120">
-                    <circle cx="60" cy="60" r="52" fill="none" stroke="#1F2937" strokeWidth="8" />
-                    <circle
-                      cx="60"
-                      cy="60"
-                      r="52"
-                      fill="none"
-                      stroke={riskColor}
-                      strokeWidth="8"
-                      strokeDasharray={`${(riskGauge / 100) * 327} 327`}
-                      strokeLinecap="round"
-                      className="transition-all duration-1000"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-black text-text-primary">{risk.score}</span>
-                  </div>
-                </div>
-
-                <span
-                  className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${riskStyle[risk.level].bg} ${riskStyle[risk.level].text} ${riskStyle[risk.level].border}`}
-                >
-                  <AlertTriangle size={11} />
-                  {risk.level}
-                </span>
-
-                <div className="mt-4 w-full space-y-1.5">
-                  {risk.factors.map((f, i) => (
-                    <p key={i} className="text-xs text-text-subtle flex items-center gap-1.5">
-                      <span className="w-1 h-1 rounded-full bg-border flex-shrink-0" />
-                      {f}
-                    </p>
-                  ))}
+          {/* Current Tier Card */}
+          <SectionCard title="Current Status" icon={Shield}>
+            <div className="flex flex-col items-center">
+              <div className="relative w-28 h-28 mb-3">
+                <svg className="w-28 h-28 -rotate-90" viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="52" fill="none" stroke="#1F2937" strokeWidth="8" />
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="52"
+                    fill="none"
+                    stroke={riskColor}
+                    strokeWidth="8"
+                    strokeDasharray={`${(currentTier / 3) * 327} 327`}
+                    strokeLinecap="round"
+                    className="transition-all duration-1000"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-2xl font-black text-text-primary">T{currentTier}</span>
                 </div>
               </div>
-            ) : (
-              <p className="text-text-subtle text-sm text-center py-4">No risk data.</p>
-            )}
+
+              <span
+                className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${statusConfig[statusKey].bg} ${statusConfig[statusKey].text} ${statusConfig[statusKey].border}`}
+              >
+                {React.createElement(statusConfig[statusKey].icon, { size: 11 })}
+                {statusConfig[statusKey].label}
+              </span>
+
+              <div className="mt-4 w-full space-y-1.5 text-center">
+                <p className="text-xs text-text-secondary font-medium">{tierLabels[currentTier]}</p>
+                <p className="text-xs text-text-subtle">{tierDescriptions[currentTier]}</p>
+              </div>
+            </div>
           </SectionCard>
         </div>
 
-        {/* ── Limits + AML row ──────────────────────────────────────────── */}
+        {/* ── Limits + Next Tier Info ──────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
           {/* Send Limits */}
@@ -330,14 +315,8 @@ export default function ComplianceCenter() {
                   <div className="flex justify-between text-xs mb-2">
                     <span className="text-text-secondary font-medium">Daily Limit</span>
                     <span className="text-text-primary font-bold">
-                      ${limits.remainingDaily.toLocaleString()} / ${limits.dailySendLimit.toLocaleString()} USDT
+                      ${limits.dailySend.toLocaleString()} USDT
                     </span>
-                  </div>
-                  <div className="h-2 bg-card-alt rounded-full overflow-hidden border border-border">
-                    <div
-                      className="h-full bg-gradient-to-r from-[#00D6A3] to-[#0084FF] rounded-full transition-all"
-                      style={{ width: `${(limits.remainingDaily / limits.dailySendLimit) * 100}%` }}
-                    />
                   </div>
                 </div>
                 {/* Monthly */}
@@ -345,65 +324,54 @@ export default function ComplianceCenter() {
                   <div className="flex justify-between text-xs mb-2">
                     <span className="text-text-secondary font-medium">Monthly Limit</span>
                     <span className="text-text-primary font-bold">
-                      ${limits.remainingMonthly.toLocaleString()} / ${limits.monthlySendLimit.toLocaleString()} USDT
+                      ${limits.monthlySend.toLocaleString()} USDT
                     </span>
                   </div>
                   <div className="h-2 bg-card-alt rounded-full overflow-hidden border border-border">
                     <div
                       className="h-full bg-primary rounded-full transition-all"
-                      style={{ width: `${(limits.remainingMonthly / limits.monthlySendLimit) * 100}%` }}
+                      style={{ width: `${Math.min(100, (currentTier / 3) * 100)}%` }}
                     />
                   </div>
                 </div>
-                <p className="text-text-subtle text-xs">Higher tiers unlock higher send limits.</p>
+                {kycStatus?.nextTier && (
+                  <p className="text-text-subtle text-xs">Complete Tier {kycStatus.nextTier} to unlock higher limits.</p>
+                )}
               </div>
             ) : (
               <p className="text-text-subtle text-sm text-center py-4">No limit data.</p>
             )}
           </SectionCard>
 
-          {/* AML Screening */}
-          <SectionCard title="AML Screening" icon={Ban}>
-            {aml ? (
+          {/* AML status from last event */}
+          <SectionCard title="Verification Status" icon={Ban}>
+            {kycStatus?.lastEvent ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-text-secondary text-sm font-medium">Risk Level</span>
+                  <span className="text-text-secondary text-sm font-medium">Last Event</span>
+                  <span className="text-text-primary font-bold text-sm">{kycStatus.lastEvent.eventType}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-text-secondary text-sm font-medium">Status</span>
                   <span
-                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${riskStyle[aml.riskLevel].bg} ${riskStyle[aml.riskLevel].text} ${riskStyle[aml.riskLevel].border}`}
+                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${
+                      kycStatus.lastEvent.status === "APPROVED"
+                        ? "bg-primary-dim text-primary border-primary-border"
+                        : kycStatus.lastEvent.status === "DECLINED"
+                        ? "bg-danger-dim text-danger border-danger/25"
+                        : "bg-warning-dim text-warning border-warning/25"
+                    }`}
                   >
-                    <AlertTriangle size={11} />
-                    {aml.riskLevel}
+                    {kycStatus.lastEvent.status}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-text-secondary text-sm font-medium">Flags</span>
-                  <span className="text-text-primary font-bold text-sm">
-                    {aml.flags.length === 0 ? "None" : aml.flags.length}
-                  </span>
+                  <span className="text-text-secondary text-sm font-medium">Provider</span>
+                  <span className="text-text-primary text-sm font-medium">{kycStatus.lastEvent.provider}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-text-secondary text-sm font-medium">Last Checked</span>
-                  <span className="text-text-primary text-sm font-medium">{formatDate(aml.createdAt)}</span>
-                </div>
-
-                {overview?.sanctionsHits && overview.sanctionsHits.length > 0 ? (
-                  <div className="bg-danger-dim border border-danger/25 rounded-lg p-3">
-                    <p className="text-xs font-bold text-danger flex items-center gap-1.5">
-                      <Ban size={13} />
-                      {overview.sanctionsHits.length} Sanctions Match(es) Found
-                    </p>
-                  </div>
-                ) : (
-                  <div className="bg-primary-dim border border-primary-border rounded-lg p-3">
-                    <p className="text-xs font-bold text-primary flex items-center gap-1.5">
-                      <CheckCircle2 size={13} />
-                      No sanctions matches found
-                    </p>
-                  </div>
-                )}
               </div>
             ) : (
-              <p className="text-text-subtle text-sm text-center py-4">No AML data.</p>
+              <p className="text-text-subtle text-sm text-center py-4">No verification data yet.</p>
             )}
           </SectionCard>
         </div>
@@ -413,35 +381,31 @@ export default function ComplianceCenter() {
           title="KYC Tier Status"
           icon={Shield}
           action={
-            profile ? (
-              <span
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${statusConfig[profile.status as StatusKey].bg} ${statusConfig[profile.status as StatusKey].text} ${statusConfig[profile.status as StatusKey].border}`}
-              >
-                {React.createElement(statusConfig[profile.status as StatusKey].icon, { size: 12 })}
-                {statusConfig[profile.status as StatusKey].label}
-              </span>
-            ) : undefined
+            <span
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${statusConfig[statusKey].bg} ${statusConfig[statusKey].text} ${statusConfig[statusKey].border}`}
+            >
+              {React.createElement(statusConfig[statusKey].icon, { size: 12 })}
+              {statusConfig[statusKey].label}
+            </span>
           }
         >
           {profile ? (
             <div className="space-y-5">
-              {/* Tier Header */}
               <div className="flex items-center gap-4 p-4 bg-card-alt rounded-lg border border-border">
                 <div className="w-12 h-12 rounded-md flex items-center justify-center bg-primary-dim">
                   <Shield size={24} className="text-primary" />
                 </div>
                 <div>
                   <p className="text-text-primary font-semibold">
-                    Tier {profile.tier}: {tierLabels[profile.tier]}
+                    Tier {currentTier}: {tierLabels[currentTier]}
                   </p>
-                  <p className="text-text-secondary text-xs mt-0.5">{tierDescriptions[profile.tier]}</p>
+                  <p className="text-text-secondary text-xs mt-0.5">{tierDescriptions[currentTier]}</p>
                   <p className="text-text-subtle text-xs mt-0.5">
-                    Limit: ${limits?.monthlySendLimit?.toLocaleString() || "500"}/month
+                    Limit: ${limits?.monthlySend?.toLocaleString() || "0"}/month
                   </p>
                 </div>
               </div>
 
-              {/* Profile Fields — Basic Identity (Tier 1) */}
               <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
                 <div>
                   <p className="text-text-subtle text-[10px] font-semibold uppercase tracking-wider mb-1">Full Name</p>
@@ -453,7 +417,7 @@ export default function ComplianceCenter() {
                 </div>
                 <div>
                   <p className="text-text-subtle text-[10px] font-semibold uppercase tracking-wider mb-1">Nationality</p>
-                  <p className="text-text-primary font-semibold">{profile.country}</p>
+                  <p className="text-text-primary font-semibold">{profile.nationality || profile.country}</p>
                 </div>
                 <div>
                   <p className="text-text-subtle text-[10px] font-semibold uppercase tracking-wider mb-1">Address</p>
@@ -461,23 +425,17 @@ export default function ComplianceCenter() {
                 </div>
               </div>
 
-              {/* Upgrade Button */}
-              {profile.tier < 3 && (
+              {currentTier < 3 && (
                 <button
-                  onClick={requestTierUpgrade}
-                  disabled={isUpgrading}
+                  onClick={() => navigate("/compliance/kyc", { state: { from: kycFrom } })}
                   className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-[#00D6A3] to-[#0084FF] text-white rounded-lg text-sm font-bold transition-opacity hover:opacity-90 disabled:opacity-50"
                 >
-                  {isUpgrading ? (
-                    <Loader2 size={16} className="animate-spin" />
-                  ) : (
-                    <ArrowUpRight size={16} />
-                  )}
-                  Upgrade to Tier {profile.tier + 1}: {tierLabels[profile.tier + 1]}
+                  <ArrowUpRight size={16} />
+                  Upgrade to Tier {currentTier + 1}: {tierLabels[currentTier + 1]}
                 </button>
               )}
 
-              {profile.tier >= 3 && (
+              {currentTier >= 3 && (
                 <p className="text-center text-text-subtle text-sm py-2">You are at the highest tier.</p>
               )}
             </div>
@@ -494,60 +452,34 @@ export default function ComplianceCenter() {
           )}
         </SectionCard>
 
-        {/* ── Compliance History ─────────────────────────────────────────── */}
+        {/* ── Event History ─────────────────────────────────────────── */}
         <div className="bg-card rounded-xl border border-border overflow-hidden">
           <div className="px-5 py-4 border-b border-border">
             <h2 className="text-text-primary font-semibold flex items-center gap-2">
-              <Scale size={18} className="text-primary" />
-              Compliance History
+              <Info size={18} className="text-primary" />
+              Verification History
             </h2>
           </div>
           <div className="divide-y divide-border">
-            {overview?.recentCases.map((c) => (
-              <div key={c.id} className="flex items-center justify-between px-5 py-4 hover:bg-card-alt transition-colors">
+            {kycStatus?.lastEvent ? (
+              <div className="flex items-center justify-between px-5 py-4 hover:bg-card-alt transition-colors">
                 <div className="flex items-center gap-3">
-                  <div
-                    className={`p-2 rounded-lg border ${
-                      c.status === "RESOLVED"
-                        ? "bg-primary-dim border-primary-border"
-                        : c.status === "INVESTIGATING"
-                        ? "bg-warning-dim border-warning/25"
-                        : "bg-card-alt border-border"
-                    }`}
-                  >
-                    <CheckCircle2
-                      size={15}
-                      className={
-                        c.status === "RESOLVED"
-                          ? "text-primary"
-                          : c.status === "INVESTIGATING"
-                          ? "text-warning"
-                          : "text-text-subtle"
-                      }
-                    />
+                  <div className="p-2 rounded-lg border bg-card-alt border-border">
+                    <CheckCircle2 size={15} className="text-primary" />
                   </div>
                   <div>
-                    <p className="text-text-primary text-sm font-semibold">{c.reason}</p>
+                    <p className="text-text-primary text-sm font-semibold">{kycStatus.lastEvent.eventType}</p>
                     <p className="text-text-subtle text-xs mt-0.5">
-                      {c.assignedTo} · {formatDate(c.createdAt)}
+                      {kycStatus.lastEvent.provider} · {new Date(kycStatus.lastEvent.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
-                <span
-                  className={`text-[10px] uppercase font-bold px-2.5 py-1 rounded-full ${
-                    c.status === "RESOLVED"
-                      ? "bg-primary-dim text-primary border border-primary-border"
-                      : c.status === "INVESTIGATING"
-                      ? "bg-warning-dim text-warning border border-warning/25"
-                      : "bg-card-alt text-text-subtle border border-border"
-                  }`}
-                >
-                  {c.status}
+                <span className="text-[10px] uppercase font-bold px-2.5 py-1 rounded-full bg-primary-dim text-primary border border-primary-border">
+                  {kycStatus.lastEvent.status}
                 </span>
               </div>
-            ))}
-            {(!overview?.recentCases || overview.recentCases.length === 0) && (
-              <div className="p-8 text-center text-text-subtle text-sm">No compliance cases found.</div>
+            ) : (
+              <div className="p-8 text-center text-text-subtle text-sm">No verification events yet.</div>
             )}
           </div>
         </div>

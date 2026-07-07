@@ -9,13 +9,15 @@ export type Decision = "APPROVE" | "REVIEW" | "BLOCK";
 export interface KycProfile {
   id: string;
   userId: string;
-  tier: KycTier;
-  status: KycStatus;
+  tier: number;
+  status: string;
   fullName: string;
   country: string;
   dateOfBirth: string;
+  nationality?: string;
   address: string;
   selfieUrl?: string;
+  diditVerificationId?: string;
   createdAt: string;
 }
 
@@ -24,6 +26,16 @@ export interface KycDocument {
   documentType: "PASSPORT" | "PASSPORT_FRONT" | "NATIONAL_ID" | "NATIONAL_ID_FRONT" | "NATIONAL_ID_BACK" | "DRIVER_LICENSE" | "DRIVER_LICENSE_FRONT" | "DRIVER_LICENSE_BACK" | "SELFIE";
   fileUrl: string;
   status: KycStatus;
+  createdAt: string;
+}
+
+export interface KycEvent {
+  id: string;
+  userId: string;
+  eventType: string;
+  status: string;
+  provider: string;
+  rawPayload: Record<string, any> | null;
   createdAt: string;
 }
 
@@ -55,6 +67,18 @@ export interface ComplianceCase {
   reason: string;
   assignedTo: string;
   createdAt: string;
+}
+
+export interface KycStatusResult {
+  profile: KycProfile | null;
+  userTier: number;
+  userStatus: string;
+  nextTier: number | null;
+  limits: {
+    dailySend: number;
+    monthlySend: number;
+  };
+  lastEvent: KycEvent | null;
 }
 
 export interface ComplianceOverview {

@@ -1,9 +1,10 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../features/auth/auth.store";
+import { useComplianceStore } from "../../features/compliance/compliance.store";
 import {
   Shield, CheckCircle2, XCircle, User, BadgeCheck, Home,
-  CloudUpload, ArrowLeft, Loader2, ExternalLink, Camera, Trash2
+  CloudUpload, ArrowLeft, Loader2, ExternalLink, Camera, Trash2, AlertTriangle, Info
 } from "lucide-react";
 
 const TIERS = [
@@ -22,16 +23,18 @@ export default function KYC() {
   const location = useLocation();
   const from = (location.state as { from?: string })?.from;
   const { user, updateUser } = useAuthStore();
+  const { kycStatus, isSubmitting, submitResult, error, fetchStatus, submitTier1, submitTier2, submitTier3, clearResult, clearError } = useComplianceStore();
+
   const [activeTab, setActiveTab] = useState<1 | 2 | 3>(1);
-  const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const [fullName, setFullName] = useState(user?.fullName || "");
   const [dob, setDob] = useState("");
   const [nationality, setNationality] = useState("");
+  const [country, setCountry] = useState("");
+  const [address, setAddress] = useState("");
 
   const [docType, setDocType] = useState("passport");
-  const [docNumber, setDocNumber] = useState("");
   const [selfie, setSelfie] = useState<string | null>(null);
   const [docFront, setDocFront] = useState<string | null>(null);
   const [docBack, setDocBack] = useState<string | null>(null);
@@ -41,42 +44,135 @@ export default function KYC() {
   const docBackRef = useRef<HTMLInputElement>(null);
   const proofAddressRef = useRef<HTMLInputElement>(null);
 
-  const [address, setAddress] = useState("");
   const [sourceOfFunds, setSourceOfFunds] = useState("");
 
-  const currentTier = user?.kycTier || 0;
-  const kycStatus = user?.kycStatus || "none";
+  useEffect(() => {
+    fetchStatus();
+  }, []);
+
+  const currentTier = kycStatus?.userTier ?? user?.kycTier ?? 0;
+  const kycUserStatus = kycStatus?.userStatus ?? user?.kycStatus ?? "none";
   const currentTierInfo = TIERS[currentTier];
+
+  const toBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result.split(",")[1]);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
 
   const handleSubmit = async () => {
     if (!user) return;
-    setSubmitting(true);
+    clearResult();
+    clearError();
+    setSuccessMsg(null);
+
+    if (activeTab === 1) {
+      const result = await submitTier1({
+        fullName,
+        dateOfBirth: dob,
+        nationality,
+        country: country || nationality,
+        address,
+      });
+      if (result) {
+        if (result.status === "APPROVED") {
+          updateUser({ ...user, kycTier: 1, kycStatus: "approved" });
+          setSuccessMsg("Tier 1 verified! Your basic identity has been confirmed.");
+        } else if (result.status === "IN_REVIEW") {
+          setSuccessMsg("Tier 1 submitted for manual review due to AML flags.");
+        } else {
+          setSuccessMsg("Tier 1 submitted for review.");
+        }
+        await fetchStatus();
+      }
+    }
 
     if (activeTab === 2) {
+      if (!docFront || !selfie) return;
       try {
-        const { complianceApi } = await import("../../features/compliance/compliance.api");
-        const docTypeUpper = docType === "drivers_license" ? "DRIVER_LICENSE" : docType === "passport" ? "PASSPORT" : "NATIONAL_ID";
-        if (docFront) await complianceApi.uploadDocument(docTypeUpper + "_FRONT", docFront);
-        if (docBack) await complianceApi.uploadDocument(docTypeUpper + "_BACK", docBack);
-        if (selfie) await complianceApi.uploadDocument("SELFIE", selfie);
-      } catch { /* silent */ }
+        const idImage = docFront.includes(",") ? docFront.split(",")[1] : docFront;
+        const selfieImage = selfie.includes(",") ? selfie.split(",")[1] : selfie;
+        const result = await submitTier2({
+          idImage,
+          selfieImage,
+          documentType: docType === "passport" ? "PASSPORT" : docType === "drivers_license" ? "DRIVER_LICENSE" : "NATIONAL_ID",
+        });
+        if (result) {
+          if (result.status === "APPROVED") {
+            updateUser({ ...user, kycTier: 2, kycStatus: "approved" });
+            setSuccessMsg("Tier 2 verified! Your identity documents have been confirmed.");
+          } else {
+            setSuccessMsg("Tier 2 verification did not pass. Check the details below.");
+          }
+          await fetchStatus();
+        }
+      } catch { /* handled by store */ }
     }
 
-    if (activeTab === 3 && proofAddress) {
+    if (activeTab === 3) {
+      if (!proofAddress) return;
       try {
-        const { complianceApi } = await import("../../features/compliance/compliance.api");
-        await complianceApi.uploadDocument("PROOF_OF_ADDRESS", proofAddress);
-      } catch { /* silent */ }
+        const poaImage = proofAddress.includes(",") ? proofAddress.split(",")[1] : proofAddress;
+        const result = await submitTier3({
+          poaImage,
+          sourceOfFunds: sourceOfFunds || undefined,
+        });
+        if (result) {
+          if (result.status === "APPROVED") {
+            updateUser({ ...user, kycTier: 3, kycStatus: "approved" });
+            setSuccessMsg("Tier 3 verified! You now have full access.");
+          } else {
+            setSuccessMsg("Tier 3 verification did not pass. Check the details below.");
+          }
+          await fetchStatus();
+        }
+      } catch { /* handled by store */ }
     }
-
-    await new Promise(r => setTimeout(r, 1500));
-    const newTier = activeTab as 0 | 1 | 2 | 3;
-    updateUser({ ...user, kycTier: newTier, kycStatus: "approved" });
-    setSubmitting(false);
-    setSuccessMsg(`KYC Tier ${activeTab} verification approved. Your limits have been updated.`);
   };
 
   const isCurrentOrHigher = currentTier >= activeTab;
+
+  const renderScores = (details: any) => {
+    if (!details) return null;
+    const items: { label: string; value: string | number; ok: boolean }[] = [];
+    if (details.aml) {
+      items.push({ label: "AML Screening", value: `${details.aml.total_hits ?? 0} hits`, ok: (details.aml.total_hits ?? 0) === 0 });
+    }
+    if (details.database) {
+      items.push({ label: "Database Match", value: `${details.database.match_rate ?? 0}%`, ok: (details.database.match_rate ?? 0) >= 80 });
+    }
+    if (details.idVerification) {
+      items.push({ label: "ID Verification", value: details.idVerification.status, ok: details.idVerification.status === "Approved" });
+    }
+    if (details.liveness) {
+      items.push({ label: "Liveness", value: `${details.liveness.score ?? 0}%`, ok: (details.liveness.score ?? 0) >= 70 });
+    }
+    if (details.faceMatch) {
+      items.push({ label: "Face Match", value: `${details.faceMatch.score ?? 0}%`, ok: (details.faceMatch.score ?? 0) >= 70 });
+    }
+    if (details.poa) {
+      items.push({ label: "Proof of Address", value: details.poa.status, ok: details.poa.status === "Approved" });
+    }
+    return (
+      <div className="mt-3 space-y-2">
+        {items.map((item) => (
+          <div key={item.label} className="flex items-center justify-between text-sm bg-card-alt rounded-lg px-3 py-2 border border-border">
+            <span className="text-text-secondary">{item.label}</span>
+            <span className={`font-semibold flex items-center gap-1.5 ${item.ok ? "text-primary" : "text-danger"}`}>
+              {item.ok ? <CheckCircle2 size={13} /> : <XCircle size={13} />}
+              {item.value}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-app-bg">
@@ -101,7 +197,33 @@ export default function KYC() {
           </div>
         )}
 
-        {/* Status Card */}
+        {submitResult && submitResult.status !== "APPROVED" && (
+          <div className="flex items-start gap-3 bg-warning-dim border border-warning/25 rounded-lg p-4 mb-5">
+            <AlertTriangle size={20} className="text-warning shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-warning text-sm font-semibold">Verification: {submitResult.status}</p>
+              {renderScores(submitResult.details)}
+            </div>
+          </div>
+        )}
+
+        {submitResult && submitResult.status === "APPROVED" && (
+          <div className="flex items-start gap-3 bg-primary-dim border border-primary-border rounded-lg p-4 mb-5">
+            <CheckCircle2 size={20} className="text-primary shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-primary text-sm font-semibold">Approved! Now at Tier {submitResult.tier}</p>
+              {renderScores(submitResult.details)}
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="flex items-center gap-3 bg-danger-dim border border-danger/25 rounded-lg p-4 mb-5">
+            <XCircle size={20} className="text-danger shrink-0" />
+            <p className="text-danger text-sm flex-1">{error}</p>
+          </div>
+        )}
+
         <div
           className="rounded-xl p-5 flex items-center justify-between mb-5 border border-border"
           style={{
@@ -120,10 +242,10 @@ export default function KYC() {
           <div className="flex flex-col items-end gap-2">
             <div
               className="px-3 py-1.5 rounded-full"
-              style={{ backgroundColor: kycStatus === "approved" ? "rgba(0,0,0,0.25)" : "rgba(245,166,35,0.2)" }}
+              style={{ backgroundColor: kycUserStatus === "approved" ? "rgba(0,0,0,0.25)" : "rgba(245,166,35,0.2)" }}
             >
               <span className="text-white text-xs font-semibold">
-                {kycStatus === "approved" ? "Verified" : kycStatus === "pending" ? "Pending" : "Unverified"}
+                {kycUserStatus === "approved" ? "Verified" : kycUserStatus === "pending" || kycUserStatus === "in_review" ? "In Review" : "Unverified"}
               </span>
             </div>
             <button
@@ -136,12 +258,11 @@ export default function KYC() {
           </div>
         </div>
 
-        {/* Tier Tabs */}
         <div className="flex gap-2 mb-4">
           {[1, 2, 3].map(t => (
             <button
               key={t}
-              onClick={() => setActiveTab(t as 1 | 2 | 3)}
+              onClick={() => { setActiveTab(t as 1 | 2 | 3); clearResult(); clearError(); }}
               className={`flex-1 flex items-center justify-center gap-1 py-2.5 rounded-md border text-sm font-medium transition-colors ${
                 activeTab === t
                   ? "border-primary bg-primary-dim text-primary"
@@ -154,7 +275,6 @@ export default function KYC() {
           ))}
         </div>
 
-        {/* Tier Info Card */}
         <div className="bg-card rounded-lg border border-border p-4 mb-5">
           <div className="flex items-center gap-3 mb-2">
             <div
@@ -171,7 +291,6 @@ export default function KYC() {
           <p className="text-text-subtle text-sm">{TIERS[activeTab].desc}</p>
         </div>
 
-        {/* Forms */}
         {activeTab === 1 && (
           <div className="mb-5">
             <h3 className="text-text-primary text-lg font-semibold mb-1">Basic Identity (Tier 1)</h3>
@@ -190,7 +309,7 @@ export default function KYC() {
                 <input
                   value={dob}
                   onChange={e => setDob(e.target.value)}
-                  placeholder="DD/MM/YYYY"
+                  placeholder="YYYY-MM-DD"
                   className="w-full bg-card border border-border rounded-md px-4 h-[52px] text-text-primary placeholder-text-subtle text-base outline-none focus:border-primary transition-colors"
                 />
               </div>
@@ -199,8 +318,27 @@ export default function KYC() {
                 <input
                   value={nationality}
                   onChange={e => setNationality(e.target.value)}
-                  placeholder="Country of nationality"
+                  placeholder="e.g., Haitian, American"
                   className="w-full bg-card border border-border rounded-md px-4 h-[52px] text-text-primary placeholder-text-subtle text-base outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-text-secondary text-sm font-medium mb-1.5">Country of Residence</label>
+                <input
+                  value={country}
+                  onChange={e => setCountry(e.target.value)}
+                  placeholder="e.g., Haiti, United States"
+                  className="w-full bg-card border border-border rounded-md px-4 h-[52px] text-text-primary placeholder-text-subtle text-base outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-text-secondary text-sm font-medium mb-1.5">Full Address</label>
+                <textarea
+                  value={address}
+                  onChange={e => setAddress(e.target.value)}
+                  placeholder="Street, city, postal code"
+                  rows={3}
+                  className="w-full bg-card border border-border rounded-md px-4 py-3 text-text-primary placeholder-text-subtle text-base outline-none focus:border-primary transition-colors resize-none"
                 />
               </div>
             </div>
@@ -210,17 +348,17 @@ export default function KYC() {
         {activeTab === 2 && (
           <div className="mb-5">
             <h3 className="text-text-primary text-lg font-semibold mb-1">Government ID (Tier 2)</h3>
-            <p className="text-text-secondary text-sm mb-4">Select your document type and enter details.</p>
+            <p className="text-text-secondary text-sm mb-4">Upload your ID document and take a selfie.</p>
             <div className="flex gap-2 mb-4">
               {[
-                { key: "passport", label: "📕 Passport" },
-                { key: "drivers_license", label: "🪪 Driver" },
-                { key: "national_id", label: "🪪 National ID" },
+                { key: "passport", label: "Passport" },
+                { key: "drivers_license", label: "Driver License" },
+                { key: "national_id", label: "National ID" },
               ].map(d => (
                 <button
                   key={d.key}
-                  onClick={() => { setDocType(d.key); setDocFront(null); setDocBack(null); }}
-                  className={`flex-1 py-2.5 rounded-md border text-[10px] font-medium transition-colors ${
+                  onClick={() => { setDocType(d.key); setDocFront(null); }}
+                  className={`flex-1 py-2.5 rounded-md border text-xs font-medium transition-colors ${
                     docType === d.key
                       ? "border-primary bg-primary-dim text-primary"
                       : "border-border bg-card text-text-secondary"
@@ -230,36 +368,24 @@ export default function KYC() {
                 </button>
               ))}
             </div>
-            <div className="mb-4">
-              <label className="block text-text-secondary text-sm font-medium mb-1.5">Document Number</label>
-              <input
-                value={docNumber}
-                onChange={e => setDocNumber(e.target.value)}
-                placeholder="Enter document number"
-                className="w-full bg-card border border-border rounded-md px-4 h-[52px] text-text-primary placeholder-text-subtle text-base outline-none focus:border-primary transition-colors"
-              />
-            </div>
-            {/* Document Front / Single */}
-            <label className="block text-text-secondary text-sm font-medium mb-1.5">
-              {docType === "passport" ? "Upload Passport" : "Upload Front Side"}
-            </label>
+
+            <label className="block text-text-secondary text-sm font-medium mb-1.5">Upload ID Document</label>
             <input
               ref={docFrontRef}
               type="file"
               accept="image/*"
               className="hidden"
-              onChange={(e) => {
+              onChange={async (e) => {
                 const file = e.target.files?.[0];
                 if (file) {
-                  const reader = new FileReader();
-                  reader.onload = () => setDocFront(reader.result as string);
-                  reader.readAsDataURL(file);
+                  const b64 = await toBase64(file);
+                  setDocFront(b64);
                 }
               }}
             />
             {docFront ? (
-              <div className="relative rounded-lg overflow-hidden border border-border mb-3">
-                <img src={docFront} alt="Document front" className="w-full h-36 object-cover" />
+              <div className="relative rounded-lg overflow-hidden border border-border mb-4">
+                <img src={`data:image/jpeg;base64,${docFront}`} alt="ID document" className="w-full h-36 object-cover" />
                 <button
                   onClick={() => { setDocFront(null); if (docFrontRef.current) docFrontRef.current.value = ""; }}
                   className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
@@ -270,74 +396,32 @@ export default function KYC() {
             ) : (
               <button
                 onClick={() => docFrontRef.current?.click()}
-                className="w-full rounded-lg border-2 border-dashed border-border p-6 flex flex-col items-center gap-1 bg-card mb-3 hover:border-primary/50 transition-colors"
+                className="w-full rounded-lg border-2 border-dashed border-border p-6 flex flex-col items-center gap-1 bg-card mb-4 hover:border-primary/50 transition-colors"
               >
                 <CloudUpload size={28} className="text-text-subtle" />
-                <p className="text-text-secondary text-xs">Tap to upload</p>
-                <p className="text-text-subtle text-[10px]">PNG, JPG • Max 10MB</p>
+                <p className="text-text-secondary text-xs">Tap to upload ID</p>
+                <p className="text-text-subtle text-[10px]">PNG, JPG</p>
               </button>
             )}
 
-            {/* Document Back — only for non-passport */}
-            {docType !== "passport" && (
-              <>
-                <label className="block text-text-secondary text-sm font-medium mb-1.5">Upload Back Side</label>
-                <input
-                  ref={docBackRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onload = () => setDocBack(reader.result as string);
-                      reader.readAsDataURL(file);
-                    }
-                  }}
-                />
-                {docBack ? (
-                  <div className="relative rounded-lg overflow-hidden border border-border mb-4">
-                    <img src={docBack} alt="Document back" className="w-full h-36 object-cover" />
-                    <button
-                      onClick={() => { setDocBack(null); if (docBackRef.current) docBackRef.current.value = ""; }}
-                      className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
-                    >
-                      <Trash2 size={14} className="text-white" />
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => docBackRef.current?.click()}
-                    className="w-full rounded-lg border-2 border-dashed border-border p-6 flex flex-col items-center gap-1 bg-card mb-4 hover:border-primary/50 transition-colors"
-                  >
-                    <CloudUpload size={28} className="text-text-subtle" />
-                    <p className="text-text-secondary text-xs">Tap to upload</p>
-                    <p className="text-text-subtle text-[10px]">PNG, JPG • Max 10MB</p>
-                  </button>
-                )}
-              </>
-            )}
-
-            <label className="block text-text-secondary text-sm font-medium mb-1.5">Selfie Verification</label>
+            <label className="block text-text-secondary text-sm font-medium mb-1.5">Selfie</label>
             <input
               ref={selfieInputRef}
               type="file"
               accept="image/*"
               capture="user"
               className="hidden"
-              onChange={(e) => {
+              onChange={async (e) => {
                 const file = e.target.files?.[0];
                 if (file) {
-                  const reader = new FileReader();
-                  reader.onload = () => setSelfie(reader.result as string);
-                  reader.readAsDataURL(file);
+                  const b64 = await toBase64(file);
+                  setSelfie(b64);
                 }
               }}
             />
             {selfie ? (
               <div className="relative rounded-lg overflow-hidden border border-border mb-4">
-                <img src={selfie} alt="Selfie" className="w-full h-48 object-cover" />
+                <img src={`data:image/jpeg;base64,${selfie}`} alt="Selfie" className="w-full h-48 object-cover" />
                 <button
                   onClick={() => { setSelfie(null); if (selfieInputRef.current) selfieInputRef.current.value = ""; }}
                   className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
@@ -363,16 +447,6 @@ export default function KYC() {
             <h3 className="text-text-primary text-lg font-semibold mb-1">Address + EDD (Tier 3)</h3>
             <div className="space-y-4 mt-4">
               <div>
-                <label className="block text-text-secondary text-sm font-medium mb-1.5">Residential Address</label>
-                <textarea
-                  value={address}
-                  onChange={e => setAddress(e.target.value)}
-                  placeholder="Full address"
-                  rows={3}
-                  className="w-full bg-card border border-border rounded-md px-4 py-3 text-text-primary placeholder-text-subtle text-base outline-none focus:border-primary transition-colors resize-none"
-                />
-              </div>
-              <div>
                 <label className="block text-text-secondary text-sm font-medium mb-1.5">Source of Funds</label>
                 <input
                   value={sourceOfFunds}
@@ -388,18 +462,17 @@ export default function KYC() {
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      const reader = new FileReader();
-                      reader.onload = () => setProofAddress(reader.result as string);
-                      reader.readAsDataURL(file);
+                      const b64 = await toBase64(file);
+                      setProofAddress(b64);
                     }
                   }}
                 />
                 {proofAddress ? (
                   <div className="relative rounded-lg overflow-hidden border border-border mb-4">
-                    <img src={proofAddress} alt="Proof of address" className="w-full h-40 object-cover" />
+                    <img src={`data:image/jpeg;base64,${proofAddress}`} alt="Proof of address" className="w-full h-40 object-cover" />
                     <button
                       onClick={() => { setProofAddress(null); if (proofAddressRef.current) proofAddressRef.current.value = ""; }}
                       className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
@@ -414,7 +487,7 @@ export default function KYC() {
                   >
                     <Home size={28} className="text-text-subtle" />
                     <p className="text-text-secondary text-xs">Tap to upload proof of address</p>
-                    <p className="text-text-subtle text-[10px]">Utility bill, bank statement • PNG, JPG • Max 10MB</p>
+                    <p className="text-text-subtle text-[10px]">Utility bill, bank statement</p>
                   </button>
                 )}
               </div>
@@ -430,10 +503,10 @@ export default function KYC() {
         ) : (
           <button
             onClick={handleSubmit}
-            disabled={submitting}
+            disabled={isSubmitting}
             className="w-full h-14 rounded-lg bg-gradient-to-r from-[#00D6A3] to-[#0084FF] flex items-center justify-center text-white text-base font-bold tracking-wide transition-opacity disabled:opacity-50 hover:opacity-90"
           >
-            {submitting ? (
+            {isSubmitting ? (
               <Loader2 size={22} className="animate-spin" />
             ) : (
               `Submit Tier ${activeTab} Verification`
