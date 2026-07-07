@@ -6,9 +6,7 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
-  AlertTriangle,
   Loader2,
-  Gauge,
   FileText,
   Scale,
   Ban,
@@ -58,21 +56,6 @@ const statusConfig: Record<
   },
 };
 
-const riskStyle: Record<string, { bg: string; text: string; border: string }> = {
-  LOW: { bg: "bg-primary-dim", text: "text-primary", border: "border-primary-border" },
-  MEDIUM: { bg: "bg-warning-dim", text: "text-warning", border: "border-warning/25" },
-  HIGH: { bg: "bg-danger-dim", text: "text-danger", border: "border-danger/25" },
-  CRITICAL: { bg: "bg-danger-dim", text: "text-danger", border: "border-danger/25" },
-};
-
-function formatDate(d: string) {
-  return new Date(d).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
 // ─── Section card wrapper ───────────────────────────────────────────────────
 
 function SectionCard({
@@ -113,10 +96,7 @@ export default function ComplianceCenter() {
   const {
     kycStatus,
     isLoading,
-    isSubmitting,
     fetchStatus,
-    submitTier1,
-    clearMessages,
   } = useComplianceStore();
 
 
@@ -127,7 +107,9 @@ export default function ComplianceCenter() {
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (isLoading && !kycStatus) {
-    return (
+  const riskColor = "#00D6A3";
+
+  return (
       <div className="min-h-screen bg-app-bg flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <Loader2 size={32} className="animate-spin text-primary" />
@@ -145,9 +127,6 @@ export default function ComplianceCenter() {
   const statusKey: StatusKey =
     currentStatus === "approved" ? "APPROVED" :
     currentStatus === "rejected" ? "REJECTED" : "PENDING";
-
-  const riskGauge = 15;
-  const riskColor = "#00D6A3";
 
   return (
     <div className="min-h-screen bg-app-bg">

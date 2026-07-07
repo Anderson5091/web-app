@@ -4,7 +4,7 @@ import { useAuthStore } from "../../features/auth/auth.store";
 import { useComplianceStore } from "../../features/compliance/compliance.store";
 import {
   Shield, CheckCircle2, XCircle, User, BadgeCheck, Home,
-  CloudUpload, ArrowLeft, Loader2, ExternalLink, Camera, Trash2, AlertTriangle, Info
+  CloudUpload, ArrowLeft, Loader2, ExternalLink, Camera, Trash2, AlertTriangle
 } from "lucide-react";
 
 const TIERS = [
