@@ -37,8 +37,8 @@ export default function Transactions() {
   }
 
   return (
-    <div className="min-h-screen bg-app-bg">
-      <div className="max-w-4xl mx-auto p-4">
+    <div className="bg-app-bg overflow-x-hidden">
+      <div className="max-w-4xl mx-auto px-4 py-4">
         <div className="flex justify-between items-center mb-4">
           <div>
             <h1 className="text-text-primary text-2xl font-bold">Transfer History</h1>

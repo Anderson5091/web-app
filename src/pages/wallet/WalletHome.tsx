@@ -25,8 +25,8 @@ export default function WalletHome() {
   }
 
   return (
-    <div className="min-h-screen bg-app-bg">
-      <div className="max-w-4xl mx-auto p-4">
+    <div className="bg-app-bg overflow-x-hidden">
+      <div className="max-w-4xl mx-auto px-4 py-4">
         <h1 className="text-text-primary text-2xl font-bold mb-6">Wallet</h1>
 
         {/* Balance Card */}
@@ -54,7 +54,7 @@ export default function WalletHome() {
 
         {/* Quick Actions */}
         <h3 className="text-text-primary text-lg font-semibold mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-4 gap-3 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           {QUICK_ACTIONS.map((a) => {
             const Icon = a.icon;
             return (
