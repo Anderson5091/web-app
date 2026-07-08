@@ -10,7 +10,7 @@ export const emailSchema = zod
 
 export const passwordSchema = zod
   .string()
-  .min(6, "Password must be at least 6 characters");
+  .min(8, "Password must be at least 8 characters");
 
 export const mfaCodeSchema = zod
   .string()

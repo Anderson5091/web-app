@@ -1,14 +1,16 @@
 import React, { useState } from "react";
-import { Eye, EyeOff, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, AlertCircle, CheckCircle } from "lucide-react";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
+  valid?: boolean;
 }
 
 export default function Input({
   label,
   error,
+  valid,
   id,
   type,
   ...props
@@ -23,13 +25,16 @@ export default function Input({
           {label}
         </label>
       ) : null}
-      <div className={`flex items-center bg-card border ${error ? "border-danger" : "border-border"} rounded-md px-4 h-[52px] transition-colors focus-within:border-primary`}>
+      <div className={`flex items-center bg-card border ${error ? "border-danger" : valid ? "border-primary" : "border-border"} rounded-md px-4 h-[52px] transition-colors focus-within:border-primary`}>
         <input
           id={id}
           type={isPassword && showPassword ? "text" : type}
           className="flex-1 bg-transparent text-text-primary placeholder-text-subtle text-base outline-none"
           {...props}
         />
+        {valid && !error && (
+          <CheckCircle size={20} className="text-primary shrink-0" />
+        )}
         {isPassword && (
           <button type="button" onClick={() => setShowPassword(!showPassword)} className="p-1 text-text-subtle hover:text-text-secondary">
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
