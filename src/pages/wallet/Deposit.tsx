@@ -11,6 +11,7 @@ const NETWORKS = [
   { key: "ETHEREUM", name: "Ethereum", symbol: "ERC-4337/7579", icon: "E" },
   { key: "POLYGON", name: "Polygon", symbol: "ERC-4337/7579", icon: "P" },
   { key: "SOLANA", name: "Solana", symbol: "Native-PDA", icon: "S" },
+  { key: "TRON", name: "Tron", symbol: "TRC-20", icon: "T" },
 ];
 
 const REQUIRED_CONFIRMATIONS = 5;
