@@ -1,9 +1,3 @@
-export interface CryptoWallet {
-  network: string;
-  chain: string;
-  address: string;
-}
-
 export interface Wallet {
   id: string;
   userId: string;
@@ -11,7 +5,6 @@ export interface Wallet {
   status: string;
   availableBalance: string;
   pendingBalance: string;
-  cryptoWallets?: CryptoWallet[];
   addresses?: { id: string; network: string; address: string }[];
 }
 
