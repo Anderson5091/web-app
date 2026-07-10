@@ -71,6 +71,13 @@ export default function Welcome() {
         >
           Sign In to Your Account
         </button>
+
+        <div className="text-center text-text-subtle text-xs">
+          <span>By continuing, you agree to our </span>
+          <button onClick={() => navigate("/privacy")} className="text-primary hover:underline">
+            Privacy Policy
+          </button>
+        </div>
       </div>
     </div>
   );

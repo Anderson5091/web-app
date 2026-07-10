@@ -4,6 +4,7 @@ import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
 import VerifyPhone from "../pages/auth/VerifyPhone";
 import MFA from "../pages/auth/MFA";
+import Privacy from "../pages/privacy/Privacy";
 import PublicRoute from "../components/guards/PublicRoute";
 import AuthLayout from "../components/layout/AuthLayout";
 import { protectedRoutes } from "./protected";
@@ -58,6 +59,7 @@ export const router = createBrowserRouter([
         path: "/mfa",
         element: <AuthLayout><MFA /></AuthLayout>,
       },
+      { path: "/privacy", element: <Privacy /> },
       ...protectedRoutes,
       {
         path: "*",
