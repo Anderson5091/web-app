@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { Copy, Check, Info, TriangleAlert, ArrowLeft, Clock, ExternalLink, Loader, XCircle } from "lucide-react";
+import { Copy, Check, Info, TriangleAlert, ArrowLeft, ExternalLink, Loader, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { WalletService } from "../../features/wallet/wallet.service";
 import { feeApi } from "../../features/fees/fee.api";
@@ -28,7 +28,6 @@ export default function Deposit() {
   const [copied, setCopied] = useState(false);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState(300);
   const [txHashCopied, setTxHashCopied] = useState(false);
   const [fee, setFee] = useState(0);
 
@@ -58,21 +57,6 @@ export default function Deposit() {
     return () => clearInterval(interval);
   }, [step, pollStatus]);
 
-  useEffect(() => {
-    if (step !== "address" || !depositStatus?.expiresAt) return;
-    const expiry = new Date(depositStatus.expiresAt).getTime();
-    const tick = () => {
-      const remaining = Math.max(0, Math.floor((expiry - Date.now()) / 1000));
-      setCountdown(remaining);
-      if (remaining <= 0) {
-        navigate("/wallet", { replace: true });
-      }
-    };
-    tick();
-    const interval = setInterval(tick, 1000);
-    return () => clearInterval(interval);
-  }, [step, depositStatus?.expiresAt, navigate]);
-
   const handleCreateDeposit = async () => {
     if (!selectedNetwork || !amount) return;
     setCreating(true);
@@ -92,8 +76,7 @@ export default function Deposit() {
         confirmations: 0,
         status: "WALLET_CREATED",
         address: result.address,
-        addressStatus: "CREATED",
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+        addressStatus: "AVAILABLE",
         createdAt: new Date().toISOString(),
       });
       setStep("address");
@@ -114,12 +97,6 @@ export default function Deposit() {
   const qrData = depositStatus?.address
     ? `${depositStatus.address}?amount=${parsedAmount.toFixed(2)}`
     : "";
-
-  const formatTime = (s: number) => {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${m}:${sec.toString().padStart(2, "0")}`;
-  };
 
   const explorerUrl = (txHash: string, network: string) => {
     const explorers: Record<string, string> = {
@@ -269,12 +246,6 @@ export default function Deposit() {
           </div>
         </div>
         <div className="flex-1 p-4 max-w-lg mx-auto w-full">
-          {countdown <= 60 && (
-            <div className="flex items-center gap-2 bg-warning-dim rounded-md p-3 border border-warning/30 mb-4">
-              <Clock size={16} className="text-warning shrink-0" />
-              <p className="text-warning text-xs font-medium">Expires in {formatTime(countdown)}</p>
-            </div>
-          )}
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-primary-dim flex items-center justify-center">
               <span className="text-primary text-lg font-bold">{selectedNetwork!.icon}</span>
@@ -322,7 +293,7 @@ export default function Deposit() {
           <div className="flex gap-3 bg-primary-dim rounded-md p-4 border border-primary-border mt-4">
             <Info size={18} className="text-primary shrink-0 mt-0.5" />
             <p className="text-text-secondary text-xs leading-5">
-              Send the exact amount to the address above. Once detected, it may take a few minutes for network confirmations. The address expires in {formatTime(countdown)}.
+              Send the exact amount to the address above. Once detected, it may take a few minutes for network confirmations. This address stays valid until used.
             </p>
           </div>
           <button

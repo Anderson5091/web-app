@@ -125,7 +125,7 @@ export default function DepositTracker() {
                 <span className={`text-[10px] text-center leading-tight ${
                   i <= stepIndex ? "text-primary" : "text-text-subtle"
                 }`}>
-                  {step === "WALLET_CREATED" ? "Created" : step === "DETECTED" ? "Detected" : step === "APPROVED" ? "Approved" : step === "SWEPT" ? "Swept" : "Complete"}
+                  {step === "WALLET_CREATED" ? "Created" : step === "DETECTED" ? "Detected" : step === "APPROVED" ? "Approved" : step === "SWEPT" ? "Confirming" : "Complete"}
                 </span>
               </div>
             ))}
