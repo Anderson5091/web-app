@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { setToken, clearToken, setRefreshToken, clearRefreshToken } from "../../utils/token";
+import { getToken, setToken, clearToken, setRefreshToken, clearRefreshToken } from "../../utils/token";
 import { authApi } from "../../api/auth.api";
 import type { User } from "../../types/auth.types";
 
@@ -18,7 +18,7 @@ type AuthState = {
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  token: null,
+  token: getToken(),
   sessionExpired: false,
   profileLoading: false,
 
