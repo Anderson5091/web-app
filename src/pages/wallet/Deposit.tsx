@@ -77,6 +77,7 @@ export default function Deposit() {
         status: "WALLET_CREATED",
         address: result.address,
         addressStatus: "AVAILABLE",
+        expiresAt: null,
         createdAt: new Date().toISOString(),
       });
       setStep("address");
