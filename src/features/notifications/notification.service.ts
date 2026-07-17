@@ -1,5 +1,6 @@
 import { notificationApi } from "./notification.api";
 import type { AppNotification } from "./notification.types";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -12,7 +13,7 @@ const mockNotifications: AppNotification[] = [
     type: "TRANSFER_UPDATE",
     channel: "IN_APP",
     title: "Transfer Completed",
-    message: "Your transfer of 500.00 USDT has been completed successfully.",
+    message: `Your transfer of 500.00 ${CURRENCY_TOKEN} has been completed successfully.`,
     status: "SENT",
     createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
   },
@@ -32,7 +33,7 @@ const mockNotifications: AppNotification[] = [
     type: "WALLET_ALERT",
     channel: "IN_APP",
     title: "Deposit Received",
-    message: "1,000.00 USDT has been deposited to your wallet.",
+    message: `1,000.00 ${CURRENCY_TOKEN} has been deposited to your wallet.`,
     status: "READ",
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
   },
@@ -52,7 +53,7 @@ const mockNotifications: AppNotification[] = [
     type: "TRANSFER_UPDATE",
     channel: "IN_APP",
     title: "Transfer Failed",
-    message: "Your transfer of 200.00 USDT has failed. Please try again.",
+    message: `Your transfer of 200.00 ${CURRENCY_TOKEN} has failed. Please try again.`,
     status: "SENT",
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
   },

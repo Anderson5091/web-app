@@ -2,10 +2,12 @@
  * Formatting utilities for Quick Send
  */
 
+import { CURRENCY_TOKEN } from "../config/constants";
+
 /**
- * Format a USDT amount for display
+ * Format a token amount for display
  */
-export const formatUSDT = (amount: number | string): string => {
+export const formatToken = (amount: number | string): string => {
   const num = typeof amount === "string" ? parseFloat(amount) : amount;
   if (isNaN(num)) return "0.00";
   return num.toLocaleString("en-US", {

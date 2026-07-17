@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { WalletService } from "../../features/wallet/wallet.service";
 import type { DepositStatus } from "../../features/wallet/wallet.types";
 import { ArrowLeft, Loader, Check, Copy, ExternalLink, XCircle } from "lucide-react";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 const REQUIRED_CONFIRMATIONS = 5;
 
@@ -193,15 +194,15 @@ export default function DepositTracker() {
           <p className="text-text-primary text-sm font-semibold mb-2">Details</p>
           <div className="flex justify-between text-sm">
             <span className="text-text-secondary">Amount</span>
-            <span className="text-text-primary font-medium">{depositStatus.amount || "—"} USDT</span>
+            <span className="text-text-primary font-medium">{depositStatus.amount || "—"} {CURRENCY_TOKEN}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-text-secondary">Fee</span>
-            <span className="text-text-primary font-medium">{depositStatus.fee || "—"} USDT</span>
+            <span className="text-text-primary font-medium">{depositStatus.fee || "—"} {CURRENCY_TOKEN}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-text-secondary">Net Received</span>
-            <span className="text-primary font-bold">{depositStatus.netAmount || "—"} USDT</span>
+            <span className="text-primary font-bold">{depositStatus.netAmount || "—"} {CURRENCY_TOKEN}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-text-secondary">Network</span>

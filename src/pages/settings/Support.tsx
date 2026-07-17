@@ -4,13 +4,14 @@ import {
   ArrowLeft, MessageCircle, Mail, Phone, Users,
   ChevronDown, ChevronUp, Send, Info, Headphones
 } from "lucide-react";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 const FAQ_ITEMS = [
   { q: "How long does a transfer take?", a: "Bank transfers typically take 1–3 business days. Mobile wallet transfers are instant to 24 hours. Cash pickup is usually available within minutes of confirmation." },
-  { q: "What is the minimum transfer amount?", a: "The minimum transfer amount is 10 USDT. This ensures fees are proportionate to the transfer value." },
+  { q: "What is the minimum transfer amount?", a: `The minimum transfer amount is 10 ${CURRENCY_TOKEN}. This ensures fees are proportionate to the transfer value.` },
   { q: "How do I increase my transaction limits?", a: "Complete higher KYC tiers to unlock larger limits. Tier 1 allows up to $500/month, Tier 2 up to $5,000/month, and Tier 3 is unlimited." },
   { q: "What happens if my transfer fails compliance?", a: "Your funds are automatically refunded to your wallet balance within 24 hours. You will receive a notification with the reason for rejection." },
-  { q: "How do I deposit USDT into my wallet?", a: "Go to Wallet → Deposit Addresses and copy your address for the desired network. Send USDT to that address from any external wallet." },
+  { q: `How do I deposit ${CURRENCY_TOKEN} into my wallet?`, a: `Go to Wallet → Deposit Addresses and copy your address for the desired network. Send ${CURRENCY_TOKEN} to that address from any external wallet.` },
   { q: "Are my funds insured?", a: "Quick Send holds all user funds in segregated wallets. We employ industry-standard security practices and multi-signature custody." },
 ];
 

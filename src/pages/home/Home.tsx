@@ -3,6 +3,7 @@ import { useWalletStore } from "../../features/wallet/wallet.store";
 import { useNotificationStore } from "../../features/notifications/notification.store";
 import { useNavigate } from "react-router-dom";
 import { Send, ArrowDownLeft, ArrowUpRight, ArrowRightLeft, History, Verified, ArrowRight, Bell } from "lucide-react";
+import { CURRENCY_TOKEN } from "../../config/constants";
 import { useEffect } from "react";
 
 export default function Home() {
@@ -67,7 +68,7 @@ export default function Home() {
           <h2 className="text-text-primary text-[42px] font-bold tabular-nums">
             ${(wallet?.availableBalance ?? "0.00")}
           </h2>
-          <p className="text-text-secondary text-base mt-0.5 mb-2">USDT</p>
+          <p className="text-text-secondary text-base mt-0.5 mb-2">{CURRENCY_TOKEN}</p>
 
           <div className="flex gap-2 flex-wrap mt-2">
             {["BASE", "ETHEREUM", "POLYGON", "SOLANA"].map((n) => (

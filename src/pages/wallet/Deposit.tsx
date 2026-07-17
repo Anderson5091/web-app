@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { WalletService } from "../../features/wallet/wallet.service";
 import { feeApi } from "../../features/fees/fee.api";
 import type { DepositStatus } from "../../features/wallet/wallet.types";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 const NETWORKS = [
   { key: "BASE", name: "Base", symbol: "ERC-4337/7579", icon: "B" },
@@ -118,7 +119,7 @@ export default function Deposit() {
           </button>
           <div>
             <h1 className="text-text-primary text-xl font-bold">Add Funds</h1>
-            <p className="text-text-secondary text-sm">Select network to deposit USDT</p>
+            <p className="text-text-secondary text-sm">{`Select network to deposit ${CURRENCY_TOKEN}`}</p>
           </div>
         </div>
         <div className="flex-1 p-4 max-w-lg mx-auto w-full">
@@ -154,7 +155,7 @@ export default function Deposit() {
           <div className="flex gap-3 bg-warning-dim rounded-md p-4 border border-warning/30 mt-4">
             <TriangleAlert size={18} className="text-warning shrink-0 mt-0.5" />
             <p className="text-warning text-xs leading-5">
-              Only send USDT to the matching network address. Sending the wrong token or using the wrong network may result in permanent loss of funds.
+              {`Only send ${CURRENCY_TOKEN} to the matching network address. Sending the wrong token or using the wrong network may result in permanent loss of funds.`}
             </p>
           </div>
         </div>
@@ -186,7 +187,7 @@ export default function Deposit() {
             </div>
           </div>
           <div className="bg-card rounded-xl p-4 border border-border mt-4">
-            <p className="text-text-secondary text-xs mb-1">Amount (USDT)</p>
+            <p className="text-text-secondary text-xs mb-1">{`Amount (${CURRENCY_TOKEN})`}</p>
             <input
               type="number"
               value={amount}
@@ -204,15 +205,15 @@ export default function Deposit() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-text-secondary">Deposit Amount</span>
-                <span className="text-text-primary font-medium">{parsedAmount.toFixed(2)} USDT</span>
+                <span className="text-text-primary font-medium">{parsedAmount.toFixed(2)} {CURRENCY_TOKEN}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-text-secondary">Fee</span>
-                <span className="text-text-primary font-medium">{fee.toFixed(2)} USDT</span>
+                <span className="text-text-primary font-medium">{fee.toFixed(2)} {CURRENCY_TOKEN}</span>
               </div>
               <div className="border-t border-border pt-2 flex justify-between text-sm">
                 <span className="text-text-secondary font-semibold">You will receive</span>
-                <span className="text-primary font-bold">{netAmount.toFixed(2)} USDT</span>
+                <span className="text-primary font-bold">{netAmount.toFixed(2)} {CURRENCY_TOKEN}</span>
               </div>
             </div>
           )}
@@ -243,7 +244,7 @@ export default function Deposit() {
           </button>
           <div>
             <h1 className="text-text-primary text-xl font-bold">Deposit Address</h1>
-            <p className="text-text-secondary text-sm">Send USDT to this address</p>
+            <p className="text-text-secondary text-sm">{`Send ${CURRENCY_TOKEN} to this address`}</p>
           </div>
         </div>
         <div className="flex-1 p-4 max-w-lg mx-auto w-full">
@@ -252,8 +253,8 @@ export default function Deposit() {
               <span className="text-primary text-lg font-bold">{selectedNetwork!.icon}</span>
             </div>
             <div>
-              <p className="text-text-primary font-semibold">{selectedNetwork!.name} - USDT</p>
-              <p className="text-text-subtle text-xs">Send only USDT to this address</p>
+              <p className="text-text-primary font-semibold">{selectedNetwork!.name} - {CURRENCY_TOKEN}</p>
+              <p className="text-text-subtle text-xs">{`Send only ${CURRENCY_TOKEN} to this address`}</p>
             </div>
           </div>
           <div className="bg-card rounded-xl p-4 border border-border mb-4">
@@ -280,11 +281,11 @@ export default function Deposit() {
             <p className="text-text-primary text-sm font-semibold">Deposit Details</p>
             <div className="flex justify-between text-sm">
               <span className="text-text-secondary">Amount</span>
-              <span className="text-text-primary font-medium">{depositStatus.amount || `${parsedAmount.toFixed(2)}`} USDT</span>
+              <span className="text-text-primary font-medium">{depositStatus.amount || `${parsedAmount.toFixed(2)}`} {CURRENCY_TOKEN}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-text-secondary">Fee</span>
-              <span className="text-text-primary font-medium">{depositStatus.fee || `${fee.toFixed(2)}`} USDT</span>
+              <span className="text-text-primary font-medium">{depositStatus.fee || `${fee.toFixed(2)}`} {CURRENCY_TOKEN}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-text-secondary">Network Fee</span>
@@ -381,7 +382,7 @@ export default function Deposit() {
           <div className="bg-card rounded-xl p-4 border border-border mt-4 space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-text-secondary">Amount</span>
-              <span className="text-text-primary font-medium">{depositStatus.amount || `${parsedAmount.toFixed(2)}`} USDT</span>
+              <span className="text-text-primary font-medium">{depositStatus.amount || `${parsedAmount.toFixed(2)}`} {CURRENCY_TOKEN}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-text-secondary">Network</span>
@@ -411,7 +412,7 @@ export default function Deposit() {
           <div className="bg-card rounded-xl p-4 border border-border w-full space-y-2 mb-6">
             <div className="flex justify-between text-sm">
               <span className="text-text-secondary">Amount Received</span>
-              <span className="text-text-primary font-bold">{depositStatus?.netAmount || `${netAmount.toFixed(2)}`} USDT</span>
+              <span className="text-text-primary font-bold">{depositStatus?.netAmount || `${netAmount.toFixed(2)}`} {CURRENCY_TOKEN}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-text-secondary">Network</span>

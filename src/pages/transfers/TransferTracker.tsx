@@ -17,6 +17,7 @@ import {
   ArrowRightLeft,
 } from "lucide-react";
 import GradientButton from "../../components/ui/GradientButton";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 /* ─── Status Steps ─── */
 const STATUS_STEPS: {
@@ -91,7 +92,7 @@ function InstantTransferDetail({ tx, onBack }: { tx: Transaction; onBack: () => 
 
         <div className="bg-gradient-to-br from-[#1A2640] to-[#151B2B] rounded-xl p-5 border border-border">
           <p className="text-white text-[40px] font-bold leading-tight">
-            {Number(tx.amount).toFixed(2)} <span className="text-lg font-medium text-white/60">USDT</span>
+            {Number(tx.amount).toFixed(2)} <span className="text-lg font-medium text-white/60">{CURRENCY_TOKEN}</span>
           </p>
           <div className="mt-3">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-success-dim text-success">
@@ -108,8 +109,8 @@ function InstantTransferDetail({ tx, onBack }: { tx: Transaction; onBack: () => 
           {[
             { label: "Reference", value: tx.transactionNumber || "—" },
             { label: "Beneficiary", value: tx.recipientName || tx.recipientEmail || "—" },
-            { label: "Amount", value: `${Number(tx.amount).toFixed(2)} USDT` },
-            { label: "Fee", value: "0 USDT" },
+            { label: "Amount", value: `${Number(tx.amount).toFixed(2)} ${CURRENCY_TOKEN}` },
+            { label: "Fee", value: `0 ${CURRENCY_TOKEN}` },
             { label: "Date", value: new Date(tx.createdAt).toLocaleDateString() },
           ].map((row) => (
             <div
@@ -233,7 +234,7 @@ export default function TransferTracker() {
             To {transfer.beneficiary?.fullName || "Recipient"}
           </p>
           <p className="text-white text-[40px] font-bold leading-tight">
-            {transfer.amount.toFixed(2)} <span className="text-lg font-medium text-white/60">USDT</span>
+            {transfer.amount.toFixed(2)} <span className="text-lg font-medium text-white/60">{CURRENCY_TOKEN}</span>
           </p>
           {transfer.destinationAmount && transfer.currency && (
             <p className="text-white/60 text-sm mt-1">
@@ -322,9 +323,9 @@ export default function TransferTracker() {
             { label: "Beneficiary", value: transfer.beneficiary?.fullName || "—" },
             { label: "Country", value: transfer.beneficiary?.country || "—" },
             { label: "Payout Method", value: methodLabel[payoutMethod] || payoutMethod.replace(/_/g, " ") || "—" },
-            { label: "Amount", value: `${transfer.amount.toFixed(2)} USDT` },
-            { label: "Fee", value: transfer.fee != null ? `${Number(transfer.fee).toFixed(2)} USDT` : "—" },
-            { label: "FX Rate", value: transfer.fxRate ? `1 USDT = ${Number(transfer.fxRate)} ${transfer.currency || "USD"}` : "—" },
+            { label: "Amount", value: `${transfer.amount.toFixed(2)} ${CURRENCY_TOKEN}` },
+            { label: "Fee", value: transfer.fee != null ? `${Number(transfer.fee).toFixed(2)} ${CURRENCY_TOKEN}` : "—" },
+            { label: "FX Rate", value: transfer.fxRate ? `1 ${CURRENCY_TOKEN} = ${Number(transfer.fxRate)} ${transfer.currency || "USD"}` : "—" },
             { label: "Recipient Gets", value: transfer.destinationAmount ? `${transfer.currency || "USD"} ${Number(transfer.destinationAmount).toLocaleString("en-US", { maximumFractionDigits: 2 })}` : "—" },
           ].map((row) => (
             <div

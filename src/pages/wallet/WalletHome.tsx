@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useWalletStore } from "../../features/wallet/wallet.store";
 import { ArrowUpRight, ArrowLeftRight, ArrowDownLeft, History, Send, ArrowRightLeft } from "lucide-react";
 import Loader from "../../components/ui/Loader";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 const QUICK_ACTIONS = [
   { label: "Add Funds", icon: ArrowDownLeft, route: "/wallet/deposit", color: "#0084FF" },
@@ -36,7 +37,7 @@ export default function WalletHome() {
           <h2 className="text-white text-[44px] font-bold mt-1">
             ${parseFloat(wallet?.availableBalance || "0").toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </h2>
-          <p className="text-white/70 text-base mb-4">USDT</p>
+          <p className="text-white/70 text-base mb-4">{CURRENCY_TOKEN}</p>
           <div className="flex items-center gap-6 bg-black/15 rounded-md p-4">
             <div>
               <p className="text-white/60 text-xs">Available</p>

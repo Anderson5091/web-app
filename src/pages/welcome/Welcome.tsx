@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../features/auth/auth.store";
 import bg from "../../assets/bg.png";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 export default function Welcome() {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ export default function Welcome() {
       {/* Top Badge */}
       <div className="relative z-10 flex justify-center px-6 pt-0 pb-8">
         <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary-dim border border-primary-border">
-          <span className="text-primary text-xs font-semibold">⚡ Powered by USDT</span>
+          <span className="text-primary text-xs font-semibold">{`⚡ Powered by ${CURRENCY_TOKEN}`}</span>
         </div>
       </div>
 
@@ -42,7 +43,7 @@ export default function Welcome() {
           Send Money<br />Globally. Instantly.
         </h1>
         <p className="text-text-secondary text-base leading-relaxed mb-8">
-          Transfer USDT worldwide with low fees, real-time tracking, and bank-grade security.
+          {`Transfer ${CURRENCY_TOKEN} worldwide with low fees, real-time tracking, and bank-grade security.`}
         </p>
 
         {/* Stats */}

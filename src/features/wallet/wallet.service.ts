@@ -1,12 +1,13 @@
 import { walletApi } from "./wallet.api";
 import type { Wallet, DepositAddress, Transaction, DepositRequest, WithdrawalResponse, DepositStatus, WithdrawalDetail } from "./wallet.types";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 const USE_MOCK = false;
 
 const mockWallet: Wallet = {
   id: "mock_wallet",
   userId: "user-001",
-  currency: "USDT",
+  currency: CURRENCY_TOKEN,
   status: "ACTIVE",
   availableBalance: "1450.00",
   pendingBalance: "50.00",

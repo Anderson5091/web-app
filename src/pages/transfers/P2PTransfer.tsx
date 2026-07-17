@@ -4,6 +4,7 @@ import { useWalletStore } from "../../features/wallet/wallet.store";
 import { WalletService } from "../../features/wallet/wallet.service";
 import { ArrowLeft, ArrowLeftRight, CheckCircle2, XCircle } from "lucide-react";
 import GradientButton from "../../components/ui/GradientButton";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 export default function P2PTransfer() {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ export default function P2PTransfer() {
             <CheckCircle2 size={32} className="text-primary" />
           </div>
           <h1 className="text-text-primary text-xl font-bold mb-1">Transfer Sent!</h1>
-          <p className="text-text-secondary text-sm mb-6">{numAmount.toFixed(2)} USDT sent to {email}</p>
+          <p className="text-text-secondary text-sm mb-6">{numAmount.toFixed(2)} {CURRENCY_TOKEN} sent to {email}</p>
           <GradientButton title="Back to Wallet" onPress={() => navigate("/wallet")} />
           <button
             onClick={() => navigate("/wallet/transactions")}
@@ -67,7 +68,7 @@ export default function P2PTransfer() {
         </button>
         <div>
           <h1 className="text-text-primary text-xl font-bold">Transfer to User</h1>
-          <p className="text-text-secondary text-sm">Send USDT to another QuickSend user</p>
+          <p className="text-text-secondary text-sm">{`Send ${CURRENCY_TOKEN} to another QuickSend user`}</p>
         </div>
       </div>
 
@@ -91,7 +92,7 @@ export default function P2PTransfer() {
         </div>
 
         <div className="bg-card rounded-xl p-4 border border-border mb-4">
-          <p className="text-text-secondary text-xs mb-1">Amount (USDT)</p>
+          <p className="text-text-secondary text-xs mb-1">{`Amount (${CURRENCY_TOKEN})`}</p>
           <input
             type="number"
             value={amount}
@@ -104,7 +105,7 @@ export default function P2PTransfer() {
         <div className="bg-card rounded-xl p-4 border border-border mb-4 space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-text-secondary">Your Balance</span>
-            <span className="text-text-primary font-medium">{balance.toFixed(2)} USDT</span>
+            <span className="text-text-primary font-medium">{balance.toFixed(2)} {CURRENCY_TOKEN}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-text-secondary">Fee</span>
@@ -114,7 +115,7 @@ export default function P2PTransfer() {
             <div className="border-t border-border pt-2 flex justify-between text-sm">
               <span className="text-text-secondary font-semibold">After Transfer</span>
               <span className={`font-bold ${numAmount > balance ? "text-danger" : "text-text-primary"}`}>
-                {Math.max(0, balance - numAmount).toFixed(2)} USDT
+                {Math.max(0, balance - numAmount).toFixed(2)} {CURRENCY_TOKEN}
               </span>
             </div>
           )}

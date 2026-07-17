@@ -1,5 +1,6 @@
 import { Banknote, Smartphone, Store, Package, Send } from "lucide-react";
 import TransferStatusBadge from "./TransferStatusBadge";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 interface Transfer {
   id: string;
@@ -51,7 +52,7 @@ export default function TransferCard({ transfer, onPress }: TransferCardProps) {
         </div>
       </div>
       <div className="text-right shrink-0">
-        <p className="text-danger text-sm font-bold">-{transfer.amount.toFixed(2)} USDT</p>
+        <p className="text-danger text-sm font-bold">-{transfer.amount.toFixed(2)} {CURRENCY_TOKEN}</p>
         <p className="text-text-subtle text-xs mt-0.5">≈ {transfer.localCurrency} {transfer.localAmount.toLocaleString()}</p>
       </div>
     </button>

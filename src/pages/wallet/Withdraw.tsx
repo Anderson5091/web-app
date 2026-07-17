@@ -6,6 +6,7 @@ import { WalletService } from "../../features/wallet/wallet.service";
 import { feeApi } from "../../features/fees/fee.api";
 import GradientButton from "../../components/ui/GradientButton";
 import type { WithdrawalResponse } from "../../features/wallet/wallet.types";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 const NETWORKS = ["BASE", "ETHEREUM", "POLYGON", "SOLANA"];
 
@@ -63,25 +64,25 @@ export default function Withdraw() {
             Withdrawal Submitted!
           </h2>
           <p className="text-primary text-base font-semibold mb-6">
-            {withdrawalResult.amount.toFixed(2)} USDT withdrawn
+            {withdrawalResult.amount.toFixed(2)} {CURRENCY_TOKEN} withdrawn
           </p>
           <div className="bg-card rounded-xl p-4 border border-border w-full space-y-2 mb-6">
             <div className="flex justify-between text-sm">
               <span className="text-text-secondary">Amount</span>
               <span className="text-text-primary font-medium">
-                {withdrawalResult.amount.toFixed(2)} USDT
+            {withdrawalResult.amount.toFixed(2)} {CURRENCY_TOKEN}
               </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-text-secondary">Fee</span>
               <span className="text-text-primary font-medium">
-                {withdrawalResult.fee.toFixed(2)} USDT
+                {withdrawalResult.fee.toFixed(2)} {CURRENCY_TOKEN}
               </span>
             </div>
             <div className="flex justify-between text-sm pt-2 border-t border-border">
               <span className="text-text-primary font-medium">Net Transfer</span>
               <span className="text-primary font-bold">
-                {withdrawalResult.netAmount.toFixed(2)} USDT
+                {withdrawalResult.netAmount.toFixed(2)} {CURRENCY_TOKEN}
               </span>
             </div>
             {withdrawalResult.txHash && (
@@ -110,7 +111,7 @@ export default function Withdraw() {
             <ArrowLeft size={18} className="text-text-primary" />
           </button>
           <div>
-            <h1 className="text-text-primary text-xl font-bold">Withdraw USDT</h1>
+            <h1 className="text-text-primary text-xl font-bold">{`Withdraw ${CURRENCY_TOKEN}`}</h1>
             <p className="text-text-secondary text-sm">Withdraw to an external wallet</p>
           </div>
         </div>
@@ -150,7 +151,7 @@ export default function Withdraw() {
 
           <div className="bg-card rounded-xl p-4 border border-border">
             <div className="flex justify-between items-center mb-2">
-              <label className="block text-text-secondary text-sm font-medium">Amount (USDT)</label>
+              <label className="block text-text-secondary text-sm font-medium">{`Amount (${CURRENCY_TOKEN})`}</label>
               <span className="text-text-subtle text-xs">Available: ${maxAmount.toFixed(2)}</span>
             </div>
             <div className="relative">
@@ -178,11 +179,11 @@ export default function Withdraw() {
           <div className="bg-card rounded-xl p-4 border border-border space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-text-secondary">Network Fee</span>
-              <span className="text-text-primary font-medium">{fee.toFixed(2)} USDT</span>
+              <span className="text-text-primary font-medium">{fee.toFixed(2)} {CURRENCY_TOKEN}</span>
             </div>
             <div className="flex justify-between text-sm pt-2 border-t border-border">
               <span className="text-text-primary font-semibold">You will receive</span>
-              <span className="text-primary font-bold">{receiveAmount.toFixed(2)} USDT</span>
+              <span className="text-primary font-bold">{receiveAmount.toFixed(2)} {CURRENCY_TOKEN}</span>
             </div>
           </div>
 

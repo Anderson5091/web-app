@@ -7,6 +7,7 @@ import { feeApi } from "../../features/fees/fee.api";
 import { ArrowLeft, Check, CheckCircle2, Shield } from "lucide-react";
 import GradientButton from "../../components/ui/GradientButton";
 import type { Beneficiary } from "../../features/beneficiaries/beneficiary.types";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 const FX_RATES: Record<string, { rate: number; currency: string; flag: string }> = {
   Philippines: { rate: 57.0, currency: "PHP", flag: "🇵🇭" },
@@ -146,7 +147,7 @@ export default function SendMoney() {
             </div>
 
             <div className="bg-card rounded-xl p-6 border border-border mb-6 text-center">
-              <p className="text-primary text-sm font-semibold mb-2">USDT</p>
+              <p className="text-primary text-sm font-semibold mb-2">{CURRENCY_TOKEN}</p>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-subtle text-2xl">$</span>
                 <input
@@ -170,17 +171,17 @@ export default function SendMoney() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-text-secondary text-sm">FX Rate</span>
-                  <span className="text-text-primary text-sm">1 USDT = {fxInfo.rate} {fxInfo.currency}</span>
+                  <span className="text-text-primary text-sm">{`1 ${CURRENCY_TOKEN} = ${fxInfo.rate} ${fxInfo.currency}`}</span>
                 </div>
                 <div className="h-px bg-border" />
                 <div className="flex justify-between items-center">
                   <span className="text-text-secondary text-sm">Fee</span>
-                  <span className="text-warning text-sm font-semibold">+{fee.toFixed(2)} USDT</span>
+                  <span className="text-warning text-sm font-semibold">{`+${fee.toFixed(2)} ${CURRENCY_TOKEN}`}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-text-primary text-base font-semibold">Total Deducted</span>
                   <span className={`text-lg font-bold ${total > maxAmount ? "text-danger" : "text-text-primary"}`}>
-                    {total.toFixed(2)} USDT
+                    {total.toFixed(2)} {CURRENCY_TOKEN}
                   </span>
                 </div>
               </div>
@@ -188,13 +189,13 @@ export default function SendMoney() {
 
             <div className="flex items-center justify-center gap-1 mb-4">
               <svg className="w-4 h-4 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
-              <span className="text-text-secondary text-sm">Available: <span className="text-primary">{maxAmount.toFixed(2)} USDT</span></span>
+              <span className="text-text-secondary text-sm">Available: <span className="text-primary">{maxAmount.toFixed(2)} {CURRENCY_TOKEN}</span></span>
             </div>
 
             {total > maxAmount && numAmount > 0 && (
               <div className="flex items-center gap-2 bg-danger-dim rounded-md p-3 border border-danger/30 mb-4">
                 <svg className="w-4 h-4 text-danger shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
-                <span className="text-danger text-sm">Insufficient balance. Please deposit more USDT.</span>
+                <span className="text-danger text-sm">{`Insufficient balance. Please deposit more ${CURRENCY_TOKEN}.`}</span>
               </div>
             )}
 
@@ -206,7 +207,7 @@ export default function SendMoney() {
           <>
             <div className="bg-gradient-to-r from-[#00D6A3] to-[#0084FF] rounded-xl p-6 text-center mb-6">
               <p className="text-white/75 text-sm mb-1">Sending</p>
-              <h2 className="text-white text-3xl font-bold">{numAmount.toFixed(2)} USDT</h2>
+              <h2 className="text-white text-3xl font-bold">{numAmount.toFixed(2)} {CURRENCY_TOKEN}</h2>
               <p className="text-white/60 text-2xl my-1">↓</p>
               <p className="text-white text-2xl font-semibold">{fxInfo.currency} {localAmount.toLocaleString("en-US", { maximumFractionDigits: 2 })}</p>
               <p className="text-white/70 text-sm mt-1">to {selectedBen.fullName}</p>
@@ -223,11 +224,11 @@ export default function SendMoney() {
 
             <div className="bg-card rounded-lg p-4 border border-border mb-3">
               <p className="text-text-secondary text-[10px] font-semibold tracking-wider uppercase mb-3">Fee Breakdown</p>
-              <ReviewRow label="Transfer Amount" value={`${numAmount.toFixed(2)} USDT`} />
-              <ReviewRow label="Transfer Fee" value={`${fee.toFixed(2)} USDT`} />
-              <ReviewRow label="FX Rate" value={`1 USDT = ${fxInfo.rate} ${fxInfo.currency}`} />
+              <ReviewRow label="Transfer Amount" value={`${numAmount.toFixed(2)} ${CURRENCY_TOKEN}`} />
+              <ReviewRow label="Transfer Fee" value={`${fee.toFixed(2)} ${CURRENCY_TOKEN}`} />
+              <ReviewRow label="FX Rate" value={`1 ${CURRENCY_TOKEN} = ${fxInfo.rate} ${fxInfo.currency}`} />
               <div className="h-px bg-border my-2" />
-              <ReviewRow label="Total Deducted" value={`${total.toFixed(2)} USDT`} highlight />
+              <ReviewRow label="Total Deducted" value={`${total.toFixed(2)} ${CURRENCY_TOKEN}`} highlight />
               <ReviewRow label="Recipient Gets" value={`${fxInfo.currency} ${localAmount.toLocaleString("en-US", { maximumFractionDigits: 2 })}`} highlight />
             </div>
 
@@ -269,7 +270,7 @@ export default function SendMoney() {
               <CheckCircle2 size={48} className="text-white" />
             </div>
             <h2 className="text-text-primary text-3xl font-bold mb-2">Transfer Submitted!</h2>
-            <p className="text-primary text-base font-semibold mb-3">{numAmount.toFixed(2)} USDT sent to {selectedBen?.fullName}</p>
+            <p className="text-primary text-base font-semibold mb-3">{numAmount.toFixed(2)} {CURRENCY_TOKEN} sent to {selectedBen?.fullName}</p>
             <p className="text-text-secondary text-sm text-center leading-6 mb-8 max-w-sm">
               Your transfer is now undergoing compliance review. You can track the status in real time.
             </p>

@@ -14,6 +14,7 @@ import {
   ArrowLeft,
   Info,
 } from "lucide-react";
+import { CURRENCY_TOKEN } from "../../config/constants";
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
@@ -292,7 +293,7 @@ export default function ComplianceCenter() {
                   <div className="flex justify-between text-xs mb-2">
                     <span className="text-text-secondary font-medium">Daily Limit</span>
                     <span className="text-text-primary font-bold">
-                      ${limits.dailySend.toLocaleString()} USDT
+                      ${limits.dailySend.toLocaleString()} {CURRENCY_TOKEN}
                     </span>
                   </div>
                 </div>
@@ -301,7 +302,7 @@ export default function ComplianceCenter() {
                   <div className="flex justify-between text-xs mb-2">
                     <span className="text-text-secondary font-medium">Monthly Limit</span>
                     <span className="text-text-primary font-bold">
-                      ${limits.monthlySend.toLocaleString()} USDT
+                      ${limits.monthlySend.toLocaleString()} {CURRENCY_TOKEN}
                     </span>
                   </div>
                   <div className="h-2 bg-card-alt rounded-full overflow-hidden border border-border">
