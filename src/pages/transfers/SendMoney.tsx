@@ -4,7 +4,7 @@ import { useBeneficiaryStore } from "../../features/beneficiaries/beneficiary.st
 import { useWalletStore } from "../../features/wallet/wallet.store";
 import { useTransferStore } from "../../features/transfers/transfer.store";
 import { feeApi } from "../../features/fees/fee.api";
-import { ArrowLeft, Check, CheckCircle2, Shield } from "lucide-react";
+import { ArrowLeft, Check, CheckCircle2, Shield, Copy, Share2 } from "lucide-react";
 import GradientButton from "../../components/ui/GradientButton";
 import type { Beneficiary } from "../../features/beneficiaries/beneficiary.types";
 import { CURRENCY_TOKEN } from "../../config/constants";
@@ -40,6 +40,7 @@ export default function SendMoney() {
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [transferError, setTransferError] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const selectedBen = beneficiaries.find((b) => b.id === selectedId);
   const numAmount = parseFloat(amount) || 0;
@@ -272,7 +273,16 @@ export default function SendMoney() {
             <h2 className="text-text-primary text-3xl font-bold mb-2">Transfer Submitted!</h2>
             <p className="text-primary text-base font-semibold mb-1">{numAmount.toFixed(2)} {CURRENCY_TOKEN} sent to {selectedBen?.fullName}</p>
             {activeTransfer?.referenceId && (
-              <p className="text-text-subtle text-sm font-mono mb-3">Ref: {activeTransfer.referenceId}</p>
+              <div className="flex items-center gap-2 mb-3">
+                <p className="text-[#0084FF] text-sm font-mono">#REF: {activeTransfer.referenceId}</p>
+                <button onClick={() => { navigator.clipboard.writeText(activeTransfer.referenceId); setCopied(true); setTimeout(() => setCopied(false), 1500); }} className="p-1 rounded hover:bg-card-alt text-text-subtle hover:text-text-primary transition-colors relative" title="Copy reference">
+                  <Copy size={14} />
+                  {copied && <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] text-white bg-black/80 px-1.5 py-0.5 rounded whitespace-nowrap">Copied!</span>}
+                </button>
+                <button onClick={() => { if (navigator.share) { navigator.share({ title: "Transfer Reference", text: activeTransfer.referenceId }); } else { navigator.clipboard.writeText(activeTransfer.referenceId); } }} className="p-1 rounded hover:bg-card-alt text-text-subtle hover:text-text-primary transition-colors" title="Share reference">
+                  <Share2 size={14} />
+                </button>
+              </div>
             )}
             <p className="text-text-secondary text-sm text-center leading-6 mb-8 max-w-sm">
               Your transfer is now undergoing compliance review. You can track the status in real time.
