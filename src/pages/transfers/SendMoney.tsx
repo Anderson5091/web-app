@@ -32,7 +32,7 @@ export default function SendMoney() {
   const navigate = useNavigate();
   const { beneficiaries, fetchBeneficiaries } = useBeneficiaryStore();
   const { wallet } = useWalletStore();
-  const { submitTransfer } = useTransferStore();
+  const { submitTransfer, activeTransfer } = useTransferStore();
 
   useEffect(() => { fetchBeneficiaries(); }, [fetchBeneficiaries]);
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -270,7 +270,10 @@ export default function SendMoney() {
               <CheckCircle2 size={48} className="text-white" />
             </div>
             <h2 className="text-text-primary text-3xl font-bold mb-2">Transfer Submitted!</h2>
-            <p className="text-primary text-base font-semibold mb-3">{numAmount.toFixed(2)} {CURRENCY_TOKEN} sent to {selectedBen?.fullName}</p>
+            <p className="text-primary text-base font-semibold mb-1">{numAmount.toFixed(2)} {CURRENCY_TOKEN} sent to {selectedBen?.fullName}</p>
+            {activeTransfer?.referenceId && (
+              <p className="text-text-subtle text-sm font-mono mb-3">Ref: {activeTransfer.referenceId}</p>
+            )}
             <p className="text-text-secondary text-sm text-center leading-6 mb-8 max-w-sm">
               Your transfer is now undergoing compliance review. You can track the status in real time.
             </p>
